@@ -39,6 +39,19 @@ var sdtheme = function () {
           return "";
       }
     }
+    showsuccess = function (val) {
+        if (val === 1 || val === "1") {
+            return '<label class="label label-success label-sm"><i class="fa fa-check"></i> 成功</label>';
+        } else if (val === 0 || val === "0") {
+            return '<label class="label label-danger label-sm"><i class="fa fa-ban"></i> 失败</label>';
+        } else if (val === 2 || val === "2")
+            return '<label class="label label-info label-sm"><i class="fa fa-trash"></i> 被叫号码不存在</label>';
+        else if (val === 3 || val === "3")
+            return '<label class="label label-info label-sm"><i class="fa fa-trash"></i> 审核不通过</label>';
+        else {
+            return "";
+        }
+    }
     showyes = function (val) {
         if (val === 1 || val === "1" || val === true) {
             return '<label class="label label-primary label-sm"><i class="fa fa-check"></i> 是</label>';
@@ -368,6 +381,7 @@ var sdtheme = function () {
         showlongstr: showlongstr,
         //显示启用或者禁用
         showenable: showenable,
+        showsuccess: showsuccess,
         //显示是否
         showyes: showyes,
         //显示枚举

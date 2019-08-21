@@ -6,6 +6,8 @@ import (
 	"github.com/lhtzbj12/sdrms/enums"
 	"github.com/lhtzbj12/sdrms/models"
 	"github.com/lhtzbj12/sdrms/utils"
+	"github.com/astaxie/beego/orm"
+	"fmt"
 )
 
 type HomeController struct {
@@ -45,6 +47,28 @@ func (c *HomeController) DoLogin() {
 		}
 		//保存用户信息到session
 		c.setBackendUser2Session(user.Id)
+
+
+		o := orm.NewOrm()
+		// 登录日志
+		m := models.LoginLog{}
+		m.Ip = c.BaseController.getClientIp()
+		m.Address = ""
+		//h, _ := time.ParseDuration("1h")
+		//now := time.Now() //.Add(8 * h)
+		//local, _ := time.LoadLocation("Asia/Chongqing") //等同于"UTC"
+		//m.CreateTime = now.In(local)
+		//fmt.Println(now.In(local))
+		m.Creator = user
+		if _, err = o.Insert(&m); err == nil {
+			//c.jsonResult(enums.JRCodeSucc, "添加成功", m.Id)
+			fmt.Println(m.Id)
+		} else {
+			//c.jsonResult(enums.JRCodeFailed, "添加失败，可能原因："+err.Error(), m.Id)
+			fmt.Println(err.Error())
+		}
+
+
 		//获取用户信息
 		c.jsonResult(enums.JRCodeSucc, "登录成功", "")
 	} else {

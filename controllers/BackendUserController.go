@@ -11,6 +11,7 @@ import (
 	"github.com/lhtzbj12/sdrms/utils"
 
 	"github.com/astaxie/beego/orm"
+	"github.com/astaxie/beego/httplib"
 )
 
 type BackendUserController struct {
@@ -21,10 +22,10 @@ func (c *BackendUserController) Prepare() {
 	//先执行
 	c.BaseController.Prepare()
 	//如果一个Controller的多数Action都需要权限控制，则将验证放到Prepare
-	c.checkAuthor("DataGrid")
+	//c.checkAuthor("DataGrid")
 	//如果一个Controller的所有Action都需要登录验证，则将验证放到Prepare
 	//权限控制里会进行登录验证，因此这里不用再作登录验证
-	//c.checkLogin()
+	c.checkLogin()
 
 }
 func (c *BackendUserController) Index() {
@@ -154,4 +155,123 @@ func (c *BackendUserController) Delete() {
 	} else {
 		c.jsonResult(enums.JRCodeFailed, "删除失败", 0)
 	}
+}
+
+
+func (c *BackendUserController) LoginLog() {
+	c.Data["activeSidebarUrl"] = c.URLFor(c.controllerName + "." + c.actionName)
+
+	c.setTpl()
+	c.LayoutSections = make(map[string]string)
+	c.LayoutSections["headcssjs"] = "backenduser/index_headcssjs.html"
+	c.LayoutSections["footerjs"] = "backenduser/loginlog_index_footerjs.html"
+	//页面里按钮权限控制
+	//c.Data["canEdit"] = c.checkActionAuthor("BackendUserController", "Edit")
+	//c.Data["canDelete"] = c.checkActionAuthor("BackendUserController", "Delete")
+}
+
+func (c *BackendUserController) LoginLogDataGrid() {
+	id := c.curUser.Id
+
+	var params models.LoginLogQueryParam
+	json.Unmarshal(c.Ctx.Input.RequestBody, &params) //
+	fmt.Println(c.Ctx.Input.RequestBody)
+	fmt.Println(params)
+	//获取数据列表和总数
+	data, total := models.LoginLogPageList(&params, &id)
+	//定义返回的数据结构
+	result := make(map[string]interface{})
+	result["total"] = total
+	result["rows"] = data
+	c.Data["json"] = result
+	c.ServeJSON()
+}
+
+func (c* BackendUserController) ModifyPassword() {
+	c.Data["activeSidebarUrl"] = c.URLFor(c.controllerName + "." + c.actionName)
+
+	c.setTpl()
+	c.LayoutSections = make(map[string]string)
+	c.LayoutSections["headcssjs"] = "backenduser/index_headcssjs.html"
+	c.LayoutSections["footerjs"] = "backenduser/modifypassword_index_footerjs.html"
+}
+
+
+
+type ModifyPasswordResult struct {
+	Oldpwd    	string `json:"oldpwd"`
+	Newpwd 		string `json:"newpwd"`
+}
+
+type PasswordResult struct {
+	Code    	int `json:"code"`
+	Message     string `json:"message"`
+}
+
+func (c* BackendUserController) PostModifyPassword() {
+	var modifyPasswordResult ModifyPasswordResult
+
+	data := c.Ctx.Input.RequestBody
+	//json数据封装到MessageState对象中
+	err := json.Unmarshal(data, &modifyPasswordResult)
+	if err != nil {
+		fmt.Println("json.Unmarshal is err:", err.Error())
+	}
+
+	oldPwd := modifyPasswordResult.Oldpwd
+	newPwd := modifyPasswordResult.Newpwd
+
+	oldPwd = utils.String2md5(oldPwd)
+	newPwd = utils.String2md5(newPwd)
+
+	oldPwd = strings.ToUpper(oldPwd)
+	newPwd = strings.ToUpper(newPwd)
+
+	req := httplib.Post("http://47.244.240.84:88/api/sms/updatePassword")
+	req.Param("username", c.curUser.UserName)
+	req.Param("userpwd", oldPwd)
+	req.Param("newpwd", newPwd)
+
+	fmt.Println(c.curUser.UserName, oldPwd, newPwd)
+
+
+	str, err := req.String()
+	if err != nil {
+		fmt.Println(err)
+	}
+	fmt.Println("--->" + str)
+
+
+	var result PasswordResult
+	if err := json.Unmarshal([]byte(str), &result); err == nil {
+		//c.Data["balance"] = balance["balance"]
+		if result.Code == 0 {
+			// 修改成功
+
+			m := &models.BackendUser{}
+			//var err error
+			if c.curUser.UserName != "" {
+				m, err = models.BackendUserOneByUsername(c.curUser.UserName)
+				if err != nil {
+					c.pageError("数据无效，请刷新后重试")
+				}
+				m.UserPwd = strings.ToLower(newPwd)
+
+				o := orm.NewOrm()
+				if _, err := o.Update(m); err != nil {
+					c.jsonResult(enums.JRCodeFailed, "编辑失败", m.Id)
+				}
+			}
+
+		}
+	} else {
+
+	}
+
+
+
+	c.Ctx.WriteString(str)
+
+	//responsedata, _ := json.Marshal(modifyPasswordResult)
+	//c.Ctx.WriteString(string(responsedata))
 }

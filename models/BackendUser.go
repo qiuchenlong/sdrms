@@ -33,6 +33,10 @@ type BackendUser struct {
 	RoleBackendUserRel []*RoleBackendUserRel `orm:"reverse(many)"` // 设置一对多的反向关系
 	ResourceUrlForList []string              `orm:"-"`
 	//CreateCourses      []*Course             `rom:"reverse(many)"` // 设置一对多的反向关系
+
+	ChannelIds            []int                 `orm:"-" form:"ChannelIds"`
+	ChannelBackendUserRel []*ChannelBackendUserRel `orm:"reverse(many)"` // 设置一对多的反向关系
+
 }
 
 // BackendUserPageList 获取分页数据
@@ -71,6 +75,21 @@ func BackendUserOne(id int) (*BackendUser, error) {
 	}
 	return &m, nil
 }
+
+
+// BackendUserOneByUsername 根据用户名获取单条
+func BackendUserOneByUsername(username string) (*BackendUser, error) {
+	//o := orm.NewOrm()
+	//m := BackendUser{UserName: username}
+	//err := o.Read(&m)
+	m := BackendUser{}
+	err := orm.NewOrm().QueryTable(BackendUserTBName()).Filter("username", username).One(&m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
 
 // BackendUserOneByUserName 根据用户名密码获取单条
 func BackendUserOneByUserName(username, userpwd string) (*BackendUser, error) {

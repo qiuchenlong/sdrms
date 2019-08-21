@@ -7,7 +7,7 @@ import (
 
 // init 初始化
 func init() {
-	orm.RegisterModel(new(Course), new(BackendUser), new(Resource), new(Role), new(RoleResourceRel), new(RoleBackendUserRel))
+	orm.RegisterModel(new(Course), new(BackendUser), new(Resource), new(Role), new(RoleResourceRel), new(RoleBackendUserRel), new(LoginLog), new(MessageState), new(Sms), new(Channel), new(ChannelBackendUserRel))
 }
 
 // TableName 下面是统一的表名管理
@@ -43,4 +43,26 @@ func RoleBackendUserRelTBName() string {
 
 func CourseTBName() string {
 	return TableName("course")
+}
+
+
+func LoginLogTBName() string {
+	return TableName("loginlog")
+}
+
+
+func MessageStateTBName() string {
+	return TableName("messagestate")
+}
+
+func SmsTBName() string {
+	return TableName("sms")
+}
+
+func ChannelTBName() string {
+	return TableName("channel")
+}
+
+func ChannelBackendUserRelTBName() string {
+	return TableName("channel_backenduser_rel")
 }

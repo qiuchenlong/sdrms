@@ -60,6 +60,21 @@ func init() {
 	beego.Router("/home/404", &controllers.HomeController{}, "*:Page404")
 	beego.Router("/home/error/?:error", &controllers.HomeController{}, "*:Error")
 
+
+	beego.Router("/sms/index", &controllers.SmsController{}, "*:Index")
+	beego.Router("/sms/send", &controllers.SmsController{}, "*:SendMessage")
+	beego.Router("/sms/sendlist", &controllers.SmsController{}, "*:SmsList")
+	beego.Router("/sms/smsdatagrid", &controllers.SmsController{}, "Post:SmsDataGrid")
+	beego.Router("/sms/postmessagestatus", &controllers.SmsController{}, "Post:PostMessageState")
+
+	beego.Router("/sms/queryBalance", &controllers.BalanceController{}, "*:Index")
+	beego.Router("/backenduser/loginlog", &controllers.BackendUserController{}, "*:LoginLog")
+	beego.Router("/backenduser/loginlogdatagrid", &controllers.BackendUserController{}, "Post:LoginLogDataGrid")
+	beego.Router("/backenduser/modifypassword", &controllers.BackendUserController{}, "*:ModifyPassword")
+	//beego.Router("/backenduser/postmodifypassword", &controllers.BackendUserController{}, "Post:PostModifyPassword")
+
+
+
 	beego.Router("/", &controllers.HomeController{}, "*:Index")
 
 }

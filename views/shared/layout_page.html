@@ -19,11 +19,11 @@
         <header class="main-header">
 
             <!-- Logo -->
-            <a href="index2.html" class="logo">
+            <a href="index.html" class="logo">
                 <!-- mini logo for sidebar mini 50x50 pixels -->
-                <span class="logo-mini"><b>R</b>MS</span>
+                <span class="logo-mini"><b>S</b>MS</span>
                 <!-- logo for regular state and mobile devices -->
-                <span class="logo-lg"><b>SD</b>RMS</span>
+                <span class="logo-lg"><b>SMS</b>MS</span>
             </a>
 
             <!-- Header Navbar -->
@@ -36,7 +36,7 @@
                 <div class="navbar-custom-menu">
                     <ul class="nav navbar-nav">
                         <!-- Messages: style can be found in dropdown.less-->
-                        <li class="dropdown messages-menu">
+                        <li class="dropdown messages-menu" style="display: none">
                             <!-- Menu toggle button -->
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-envelope-o"></i>
@@ -73,7 +73,7 @@
                         <!-- /.messages-menu -->
 
                         <!-- Notifications Menu -->
-                        <li class="dropdown notifications-menu">
+                        <li class="dropdown notifications-menu" style="display: none">
                             <!-- Menu toggle button -->
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-bell-o"></i>
@@ -98,7 +98,7 @@
                             </ul>
                         </li>
                         <!-- Tasks Menu -->
-                        <li class="dropdown tasks-menu">
+                        <li class="dropdown tasks-menu" style="display: none">
                             <!-- Menu Toggle Button -->
                             <a href="#" class="dropdown-toggle" data-toggle="dropdown">
                                 <i class="fa fa-flag-o"></i>
@@ -141,7 +141,8 @@
                                 <!-- The user image in the navbar-->
                                 <img src="{{.backenduser.Avatar}}" class="user-image" alt="User Image">
                                 <!-- hidden-xs hides the username on small devices so only the image appears. -->
-                                <span class="hidden-xs">{{.backenduser.RealName}}</span>
+                                <span class="hidden-xs" hidden>{{.backenduser.RealName}}</span>
+                                <span class="hidden-xs">{{.backenduser.UserName}}</span>
                             </a>
                             <ul class="dropdown-menu">
                                 <!-- The user image in the menu -->
@@ -149,7 +150,7 @@
                                     <img src="{{.backenduser.Avatar}}" class="img-circle" alt="User Image">
 
                                     <p>
-                                        高级开发工程师                                       
+                                        {{.backenduser.RealName}}
                                     </p>
                                 </li>
                                 <!-- Menu Body -->
@@ -178,7 +179,7 @@
                             </ul>
                         </li>
                         <!-- Control Sidebar Toggle Button -->
-                        <li>
+                        <li style="display: none">
                             <a href="#" data-toggle="control-sidebar"><i class="fa fa-gears"></i></a>
                         </li>
                     </ul>
@@ -200,10 +201,10 @@
         <footer class="main-footer">
             <!-- To the right -->
             <div class="pull-right hidden-xs">
-                lhtzbj12@126.com
+                ***
             </div>
             <!-- Default to the left -->
-            <strong>Copyright &copy; 2019 <a href="#">SDRMS权限管理系统</a>.</strong>
+            <strong>Copyright &copy; 2019 <a href="#">移动业务综合管理系统</a>.</strong>
         </footer>
         {{ template "shared/control-sidebar.html" }}
     </div>

@@ -171,3 +171,10 @@ func (c *BaseController) pageLogin() {
 	c.Redirect(url, 302)
 	c.StopRun()
 }
+
+
+// 获取ip
+func (c *BaseController) getClientIp() string {
+	s := strings.Split(c.Ctx.Request.RemoteAddr, ":")
+	return s[0]
+}
