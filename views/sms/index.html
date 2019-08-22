@@ -17,27 +17,28 @@
                 <label>手机号</label>
                 <!-- <input type="text" id="mobiles" name="Mobiles" class="form-control" placeholder="最大10000个，号码之间以英文逗号,分隔" value="{{.m.UserName}}"> -->
 
-                <textarea id="mobiles" name="Mobiles" class="form-control required" style="height: 300px"></textarea>
+                <textarea id="mobiles" name="Mobiles" class="form-control required" placeholder="直接输入手机号码，以回车键间隔" style="height: 300px"></textarea>
             </div>
         </div>
         <div class="col-md-12">
             <div class="form-group">
                 <label>短信内容</label>
-                <input type="text" id="content" name="Content" class="form-control" placeholder="">
+                <input type="text" id="content" name="Content" class="form-control" placeholder="短信不超过63个字符，超过则按照2条计价">
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="form-group">
                 <label>签名</label>
                 <input type="text" id="sign" name="Sign" class="form-control" placeholder="可以为空">
             </div>
         </div>
-        <div class="col-md-6">
+        <div class="col-md-12">
             <div class="form-group">
                 <label>发送定时时间</label>
                 <!--指定 date标记-->
                 <div class="input-group date">
                     <input type="text" class="form-control" id="datetimepicker"/>
+                    {{/*disabled="disabled"*/}}
                     <span class="input-group-addon">
                         <span class="glyphicon glyphicon-calendar"></span>
                     </span>
@@ -47,7 +48,7 @@
         </div>
         <div class="align-center">
             <button type="button" class="btn btn-primary" onclick="sendMessage()">发送</button>
-            <button type="button" class="btn btn-default" onclick="returnList()">返回</button>
+            <button type="button" class="btn btn-default" onclick="returnList()" style="display: none">返回</button>
         </div>
     </div>
 

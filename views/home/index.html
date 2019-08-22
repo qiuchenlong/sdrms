@@ -8,21 +8,47 @@
 <!-- Main content -->
 <section class="content container-fluid">
 
+    <!-- jquery -->
+    <script src="/static/plugins/jquery-v3.3.1/jquery.min.js"></script>
 
     <script>
-        function queryBalance() {
-            $.ajax({
-                type: "GET",
-                url: "/sms/queryBalance",
-                data: "",
-                success: function (result) {
-                    console.log(result)
-                },
-                error: function (error) {
-                    console.log(error)
+        // function queryBalance() {
+        //     $.ajax({
+        //         type: "GET",
+        //         url: "/sms/queryBalance",
+        //         data: "",
+        //         success: function (result) {
+        //             console.log(result)
+        //         },
+        //         error: function (error) {
+        //             console.log(error)
+        //         }
+        //     })
+        // }
+
+        $.ajax({
+            type: "GET",
+            url: "/sms/smsdatagridall",
+            data: "",
+            success: function (result) {
+                console.log(result)
+                // let res = JSON.parse(result)
+                $("#today_send_total").text(result.total)
+
+                let successNum = 0;
+                let i = 0;
+                for (i = 0; i < result.rows.length; i ++) {
+                    if (result.rows[i].report_state == 1) {
+                        successNum += 1
+                    }
                 }
-            })
-        }
+                $("#today_send_success_bit").html(successNum/result.total*100 + "<sup style=\"font-size: 20px\">%</sup>")
+                $("#today_send_success_num").text(successNum)
+            },
+            error: function (error) {
+                console.log(error)
+            }
+        })
     </script>
 
 
@@ -32,8 +58,8 @@
                 <!-- small box -->
                 <div class="small-box bg-aqua">
                     <div class="inner">
-                        <h3>150</h3>
-                        <p>xxx</p>
+                        <h3 id="today_send_total">0</h3>
+                        <p>今日总发送量</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-bag"></i>
@@ -46,9 +72,9 @@
                 <!-- small box -->
                 <div class="small-box bg-green">
                     <div class="inner">
-                        <h3>53<sup style="font-size: 20px">%</sup></h3>
+                        <h3 id="today_send_success_bit">0<sup style="font-size: 20px">%</sup></h3>
 
-                        <p>xxx</p>
+                        <p>今日成功率</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-stats-bars"></i>
@@ -61,9 +87,9 @@
                 <!-- small box -->
                 <div class="small-box bg-yellow">
                     <div class="inner">
-                        <h3>440</h3>
+                        <h3 id="today_send_success_num">0</h3>
 
-                        <p>xxx</p>
+                        <p>今日发送成功数</p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-person-add"></i>
@@ -76,9 +102,9 @@
                 <!-- small box -->
                 <div class="small-box bg-red">
                     <div class="inner">
-                        <h3>650</h3>
+                        <h3></h3>
 
-                        <p>xxx</p>
+                        <p></p>
                     </div>
                     <div class="icon">
                         <i class="ion ion-pie-graph"></i>

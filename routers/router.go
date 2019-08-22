@@ -9,12 +9,12 @@ import (
 func init() {
 
 	//课程路由
-	beego.Router("/course/index", &controllers.CourseController{}, "*:Index")
-	beego.Router("/course/datagrid", &controllers.CourseController{}, "Get,Post:DataGrid")
-	beego.Router("/course/edit/?:id", &controllers.CourseController{}, "Get,Post:Edit")
-	beego.Router("/course/delete", &controllers.CourseController{}, "Post:Delete")
-	beego.Router("/course/updateseq", &controllers.CourseController{}, "Post:UpdateSeq")
-	beego.Router("/course/uploadimage", &controllers.CourseController{}, "Post:UploadImage")
+	//beego.Router("/course/index", &controllers.CourseController{}, "*:Index")
+	//beego.Router("/course/datagrid", &controllers.CourseController{}, "Get,Post:DataGrid")
+	//beego.Router("/course/edit/?:id", &controllers.CourseController{}, "Get,Post:Edit")
+	//beego.Router("/course/delete", &controllers.CourseController{}, "Post:Delete")
+	//beego.Router("/course/updateseq", &controllers.CourseController{}, "Post:UpdateSeq")
+	//beego.Router("/course/uploadimage", &controllers.CourseController{}, "Post:UploadImage")
 
 	//用户角色路由
 	beego.Router("/role/index", &controllers.RoleController{}, "*:Index")
@@ -72,6 +72,22 @@ func init() {
 	beego.Router("/backenduser/loginlogdatagrid", &controllers.BackendUserController{}, "Post:LoginLogDataGrid")
 	beego.Router("/backenduser/modifypassword", &controllers.BackendUserController{}, "*:ModifyPassword")
 	//beego.Router("/backenduser/postmodifypassword", &controllers.BackendUserController{}, "Post:PostModifyPassword")
+
+
+	beego.Router("/channel/index", &controllers.ChannelController{}, "*:Index")
+	beego.Router("/channel/datagrid", &controllers.ChannelController{}, "Get,Post:DataGrid")
+	beego.Router("/channel/edit/?:id", &controllers.ChannelController{}, "Get,Post:Edit")
+	beego.Router("/channel/delete", &controllers.ChannelController{}, "Post:Delete")
+
+
+
+	beego.Router("/channelbackenduser/index", &controllers.ChannelBackendUserController{}, "*:Index")
+	beego.Router("/channelbackenduser/datagrid", &controllers.ChannelBackendUserController{}, "Get,Post:DataGrid")
+	beego.Router("/channelbackenduser/edit/?:id", &controllers.ChannelBackendUserController{}, "Get,Post:Edit")
+	beego.Router("/channelbackenduser/delete", &controllers.ChannelBackendUserController{}, "Post:Delete")
+
+
+	beego.Router("/sms/smsdatagridall", &controllers.SmsController{}, "Get:SmsDataGridAll")
 
 
 

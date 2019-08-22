@@ -10,6 +10,8 @@ import (
 	"strconv"
 )
 
+
+// 短信主体表
 func (a *Sms) TableName() string {
 	return SmsTBName()
 }
@@ -21,16 +23,21 @@ type SmsQueryParam struct {
 }
 
 type Sms struct {
-	Id					int
-	Msgid    			string `json:"msgid"`
+	Id					int                     // 1、主键
 	Mobile	 			string `json:"mobile"`
 	Content				string `json:"content"`
-	Sign				string `json:"sign"`
-	State    			int `json:"state"`
-	Datetime 			string `json:"datetime"`
-	Creator				*BackendUser `orm:"rel(fk)"` //设置一对多关系
+	Sign				string `json:"sign"`   // 5、短信签名
+	State    			int `json:"state"`   // 6、状态
+	Datetime 			string `json:"datetime"`  // 7、提交时间
+	Creator				*BackendUser `orm:"rel(fk)"` //设置一对多关系   一个用户 对应 多条短信  2、用户
+	Channel				*Channel `orm:"rel(fk)"`  //设置一对多关系   一个通道 对应 多条短信  3、通道
+	Price               float32 `json:"price"`   // 价格  4、价格
 
-	//MsgState 			*MessageState `orm:"rel(one)"` // 设置一对多的反向关系
+	Code				int `json:"code"` // 8、返回码
+	Message				string `json:"message"`  // 9、返回消息
+	Msgid    			int `json:"msgid"`  // 10、msgid
+
+	//MsgState 			*MessaeState `orm:"rel(one)"` // 设置一对多的反向关系
 
 }
 
@@ -51,6 +58,32 @@ func SmsListPageList(params *SmsQueryParam, id *int) ([]*Sms, int64) {
 		sortorder = "-" + sortorder
 	}
 	query = query.Filter("Creator", &id).RelatedSel()//"name__istartswith", params.NameLike
+	total, _ := query.Count()
+	fmt.Println(params.Limit, params.Offset)
+	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
+	return data, total
+}
+
+
+
+
+// CoursePageList 获取分页数据
+func SmsDetailListPageList(params *SmsDetailQueryParam, id *int) ([]*SmsDetail, int64) {
+	query := orm.NewOrm().QueryTable(SmsDetailTBName())
+	data := make([]*SmsDetail, 0)
+	//默认排序
+	sortorder := "Id"
+	switch params.Sort {
+	case "Id":
+		sortorder = "Id"
+		//case "Seq":
+		//	sortorder = "Seq"
+	}
+	if params.Order == "desc" {
+		sortorder = "-" + sortorder
+	}
+	// .Filter("Creator", &id)
+	query = query.RelatedSel().Filter("Sms__Creator__Id", id)//"name__istartswith", params.NameLike
 	total, _ := query.Count()
 	fmt.Println(params.Limit, params.Offset)
 	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
@@ -81,7 +114,7 @@ func SmsListPageList(params *SmsQueryParam, id *int) ([]*Sms, int64) {
 
 
 
-func SmsBatchInsert(sms []Sms, id int) (int64) {
+func SmsBatchInsert(sms []Sms) (int64) {
 
 	db_type := beego.AppConfig.String("db_type")
 	db_name := beego.AppConfig.String(db_type + "::db_name")
@@ -102,7 +135,7 @@ func SmsBatchInsert(sms []Sms, id int) (int64) {
 	fmt.Println(mobilelist)
 
 
-	execstring := "INSERT INTO rms_sms (msgid, mobile, content, sign, state, datetime, creator_id)VALUES"
+	execstring := "INSERT INTO rms_sms (mobile, content, sign, state, datetime, creator_id, channel_id, price, code, message, msgid)VALUES"
 	data := ""
 
 	fmt.Println(time.Now().Unix())
@@ -119,17 +152,33 @@ func SmsBatchInsert(sms []Sms, id int) (int64) {
 
 		for j := i * 10; j < i*10+len(mobilelist); j++ {
 			if j < i*10+(len(mobilelist)-1) {
-				//id := strconv.Itoa(j)
-				//onedata := "(" + id + ", '0', '20180103002930'), "
-				onedata := "('"+ sms[0].Msgid +"', '"+ mobilelist[j - i*10] + "', '"+ sms[0].Content + "', '"+ sms[0].Sign + "', '"+ strconv.Itoa(sms[0].State) +"', '"+ sms[0].Datetime + "', '" + strconv.Itoa(id) + "'), "
-				//onedata := "('1', '1', '1', '1', '1'), "
+				onedata := "('"+ mobilelist[j - i*10] +
+					"', '"+ sms[0].Content +
+					"', '"+ sms[0].Sign +
+					"', '"+ strconv.Itoa(sms[0].State) +
+					"', '"+ sms[0].Datetime +
+					"', '"+ strconv.Itoa(sms[0].Creator.Id) +
+					"', '"+ strconv.Itoa(sms[0].Channel.Id) +
+					"', '"+ strconv.FormatFloat(float64(sms[0].Price), 'f', 2, 32) +
+
+					"', '"+ strconv.Itoa(sms[0].Code) +
+					"', '"+ sms[0].Message +
+					"', '"+ strconv.Itoa(sms[0].Msgid) +
+					"'), "
 				data = data + onedata
 			} else {
-				//id := strconv.Itoa(j)
-				//onedata := "(" + id + ",'0', '20180103002930')"
-				//onedata := "('"+ sms[j - i*10].Msgid +"', '1', '1', '1', '1')"
-				onedata := "('"+ sms[0].Msgid +"', '"+ mobilelist[j - i*10] + "', '"+ sms[0].Content + "', '"+ sms[0].Sign + "', '"+ strconv.Itoa(sms[0].State) +"', '"+ sms[0].Datetime + "', '" + strconv.Itoa(id) + "') "
-				//onedata := "('1', '1', '1', '1', '1')"
+				onedata := "('"+ mobilelist[j - i*10] +
+					"', '"+ sms[0].Content +
+					"', '"+ sms[0].Sign +
+					"', '"+ strconv.Itoa(sms[0].State) +
+					"', '"+ sms[0].Datetime +
+					"', '"+ strconv.Itoa(sms[0].Creator.Id) +
+					"', '"+ strconv.Itoa(sms[0].Channel.Id) +
+					"', '"+ strconv.FormatFloat(float64(sms[0].Price), 'f', 2, 32) +
+					"', '"+ strconv.Itoa(sms[0].Code) +
+					"', '"+ sms[0].Message +
+					"', '"+ strconv.Itoa(sms[0].Msgid) +
+					"') "
 				data = data + onedata
 			}
 		}
@@ -162,4 +211,24 @@ func SmsBatchInsert(sms []Sms, id int) (int64) {
 	fmt.Println(time.Now().Unix())
 
 	return 1
+}
+
+
+
+// SmsOne 获取单条
+func SmsOne(msgid int) (*Sms, error) {
+	//o := orm.NewOrm()
+	//m := Sms{Msgid: msgid}
+	//err := o.Read(&m)
+	//if err != nil {
+	//	return nil, err
+	//}
+	//return &m, nil
+
+	m := Sms{}
+	err := orm.NewOrm().QueryTable(SmsTBName()).Filter("msgid__in", msgid).One(&m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
 }
