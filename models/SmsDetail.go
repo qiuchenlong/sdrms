@@ -164,14 +164,14 @@ func SmsDetailStateBatchUpdate(smsDetailState []SmsDetailState) (bool) {
 	execstring := "UPDATE rms_smsdetail SET "
 	execstring += "report_state = CASE id"
 	for _, value := range smsDetailState {
-		execstring += " WHEN " + strconv.Itoa(value.Msgid) + " THEN " + strconv.Itoa(value.State) + " "
-		ids += (strconv.Itoa(value.Msgid) + ",")
+		execstring += " WHEN " + value.Msgid + " THEN " + value.State + " "
+		ids += (value.Msgid + ",")
 	}
 	execstring += " END, "
 	execstring += "report_datetime = CASE id"
 	for _, value := range smsDetailState {
-		execstring += " WHEN " + strconv.Itoa(value.Msgid) + " THEN " + value.Datetime + " " //time.Now().Format("2006-01-02 15:04:05")
-		ids += (strconv.Itoa(value.Msgid) + ",")
+		execstring += " WHEN " + value.Msgid + " THEN " + value.Datetime + " " //time.Now().Format("2006-01-02 15:04:05")
+		ids += (value.Msgid + ",")
 	}
 	execstring += " END "
 	execstring += " WHERE id IN (" + ids[0 : len(ids)-1] +")"
