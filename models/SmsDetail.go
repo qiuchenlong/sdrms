@@ -170,7 +170,7 @@ func SmsDetailStateBatchUpdate(smsDetailState []SmsDetailState) (bool) {
 	execstring += " END, "
 	execstring += "report_datetime = CASE id"
 	for _, value := range smsDetailState {
-		execstring += " WHEN " + value.Msgid + " THEN " + value.Datetime + " " //time.Now().Format("2006-01-02 15:04:05")
+		execstring += " WHEN " + value.Msgid + " THEN '" + value.Datetime + "' " //time.Now().Format("2006-01-02 15:04:05")
 		//ids += (value.Msgid + ",")
 	}
 	execstring += " END "
