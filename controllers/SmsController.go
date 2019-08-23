@@ -254,16 +254,20 @@ func (c *SmsController) PostMessageState() {
 	//MessageState
 	//for _,  := range MessageState {
 
+	
+	if len(smsDetailState) {
+		fmt.Println("data=",  smsDetailState[0].Msgid)
 
-	fmt.Println("data=",  smsDetailState[0].Msgid)
 
+		fmt.Println("更新是否成功？", models.SmsDetailStateBatchUpdate(smsDetailState))
 
-	fmt.Println("更新是否成功？", models.SmsDetailStateBatchUpdate(smsDetailState))
+		//c.Ctx.WriteString("{'id':"+ strconv.Itoa(len(MessageState)) +"}")
 
-	//c.Ctx.WriteString("{'id':"+ strconv.Itoa(len(MessageState)) +"}")
-
-	responsedata, _ := json.Marshal(smsDetailState)
-	c.Ctx.WriteString(string(responsedata))
+		responsedata, _ := json.Marshal(smsDetailState)
+		c.Ctx.WriteString(string(responsedata))
+	} else {
+		c.Ctx.WriteString("{'code': -1}")
+	}
 
 }
 
