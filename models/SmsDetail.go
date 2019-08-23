@@ -138,9 +138,9 @@ func SmsDetailBatchInsert(smsDetail []SmsDetail) (int64) { //, id *int
 
 
 type SmsDetailState struct {
-	Msgid    int `json:"msgid"`
+	Msgid    string `json:"msgid"`
 	Mobile   string `json:"mobile"`
-	State    int    `json:"state"`
+	State    string    `json:"state"`
 	Datetime string `json:"datetime"`
 }
 
