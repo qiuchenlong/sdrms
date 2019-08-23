@@ -255,7 +255,7 @@ func (c *SmsController) PostMessageState() {
 	//for _,  := range MessageState {
 
 	
-	if len(smsDetailState) {
+	if len(smsDetailState) > 0 {
 		fmt.Println("data=",  smsDetailState[0].Msgid)
 
 
