@@ -66,3 +66,8 @@ func ChannelTBName() string {
 func ChannelBackendUserRelTBName() string {
 	return TableName("channel_backenduser_rel")
 }
+
+
+func DepositTBName() string {
+	return TableName("deposit")
+}

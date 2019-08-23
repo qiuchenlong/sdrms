@@ -90,6 +90,9 @@ func init() {
 	beego.Router("/sms/smsdatagridall", &controllers.SmsController{}, "Get:SmsDataGridAll")
 
 
+	// 充值中心
+	beego.Router("/deposit/index", &controllers.DepositController{}, "*:Index")
+
 
 	beego.Router("/", &controllers.HomeController{}, "*:Index")
 
