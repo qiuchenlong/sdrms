@@ -251,6 +251,9 @@ func (c *SmsController) PostMessageState() {
 		fmt.Println("json.Unmarshal is err:", err.Error())
 	}
 
+	
+	fmt.Println(data, &data)
+	
 	//MessageState
 	//for _,  := range MessageState {
 
