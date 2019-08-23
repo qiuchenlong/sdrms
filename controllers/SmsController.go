@@ -252,7 +252,7 @@ func (c *SmsController) PostMessageState() {
 	}
 
 	
-	fmt.Println(data, &data)
+	fmt.Println(data, string(data))
 	
 	//MessageState
 	//for _,  := range MessageState {
