@@ -5,6 +5,8 @@ import (
 	"github.com/lhtzbj12/sdrms/models"
 	"github.com/lhtzbj12/sdrms/enums"
 	"fmt"
+	"time"
+	"github.com/astaxie/beego/orm"
 )
 
 type DepositController struct {
@@ -76,7 +78,7 @@ func (c *DepositController) Edit() {
 func (c *DepositController) Add() {
 	m := models.Deposit{}
 	mf := models.DepositFrom{}
-	//o := orm.NewOrm()
+	o := orm.NewOrm()
 	var err error
 	//获取form里的值
 	if err = c.ParseForm(&mf); err != nil {
@@ -84,51 +86,51 @@ func (c *DepositController) Add() {
 	}
 
 
-	//userId := mf.BackendUserId
-	//
-	//m.BackendUser, _ = models.BackendUserOne(userId)
-	//
-	//m.Money = mf.Money
-	//m.Created = time.Now()
-	//m.Type = mf.Type
-	//m.Remarks = mf.Remarks
-	//
-	//fmt.Println("========================", m, userId)
-	//
-	//
-	//
-	//// 查找关联的用户通道数据
-	//oM := models.ChannelBackendUserRel{}
-	//errs := o.QueryTable(models.ChannelBackendUserRelTBName()).Filter("backenduser__id", userId).One(&oM)
-	//if errs != nil {
-	//	c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
-	//}
-	//
-	//
-	//oM.Hit = 1
-	//if _, err := o.Update(&oM); err != nil {
-	//	c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
-	//}
-	//
-	//
-	//oM.Hit = 0
-	//m.BeforeMoney = oM.Balance
-	//m.AfterMoney = oM.Balance + m.Money
-	//
-	//// 对用户通道余额+?
-	//oM.Balance = oM.Balance + m.Money
-	//fmt.Println("========================", oM)
-	//if _, err := o.Update(&oM); err != nil {
-	//	c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
-	//}
-	//
-	//
-	//m.Channel, _ = models.ChannelOne(oM.Channel.Id)
-	//
-	//// 写入充值记录中
-	//if _, err := o.Insert(&m); err != nil {
-	//	c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
-	//}
+	userId := mf.BackendUserId
+
+	m.BackendUser, _ = models.BackendUserOne(userId)
+
+	m.Money = mf.Money
+	m.Created = time.Now()
+	m.Type = mf.Type
+	m.Remarks = mf.Remarks
+
+	fmt.Println("========================", m, userId)
+
+
+
+	// 查找关联的用户通道数据
+	oM := models.ChannelBackendUserRel{}
+	errs := o.QueryTable(models.ChannelBackendUserRelTBName()).Filter("backenduser__id", userId).One(&oM)
+	if errs != nil {
+		c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
+	}
+
+
+	oM.Hit = 1
+	if _, err := o.Update(&oM); err != nil {
+		c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
+	}
+
+
+	oM.Hit = 0
+	m.BeforeMoney = oM.Balance
+	m.AfterMoney = oM.Balance + m.Money
+
+	// 对用户通道余额+?
+	oM.Balance = oM.Balance + m.Money
+	fmt.Println("========================", oM)
+	if _, err := o.Update(&oM); err != nil {
+		c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
+	}
+
+
+	m.Channel, _ = models.ChannelOne(oM.Channel.Id)
+
+	// 写入充值记录中
+	if _, err := o.Insert(&m); err != nil {
+		c.jsonResult(enums.JRCodeFailed, "充值失败", m.Id)
+	}
 
 	c.jsonResult(enums.JRCodeSucc, "充值成功", 1)
 	
