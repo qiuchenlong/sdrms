@@ -259,7 +259,7 @@ func SmsDetailAllListPageList(params *SmsDetailQueryParam) ([]*SmsDetail, int64)
 		sortorder = "-" + sortorder
 	}
 	// .Filter("Creator", &id)
-	query = query.Filter("submit_datetime__istartswith", time.Now().Format("2006-01-02")).RelatedSel() //"name__istartswith", params.NameLike
+	query = query.Filter("submit_datetime__gte", time.Now().Format("2006-01-02")).RelatedSel() //"name__istartswith", params.NameLike
 	//fmt.Println(params.Mobile)
 	//if len(params.Mobile) > 0 {
 	//	query = query.Filter("mobile", params.Mobile)
