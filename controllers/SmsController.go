@@ -7,7 +7,6 @@ import (
 	"time"
 	"strings"
 	"github.com/astaxie/beego/httplib"
-	"strconv"
 )
 
 type SmsController struct {
@@ -170,13 +169,13 @@ func (c *SmsController) SendMessage() {
 		//pwdmd5.Write([]byte(userpwd)) // 需要加密的字符串为 sharejs.com
 
 		req := httplib.Post("http://47.244.240.84:88/api/sms/massSend")
-		//req.Param("username", username)
-		//req.Param("userpwd", userpwd)
-		//req.Param("mobiles", mobiles)
-		//req.Param("content", content)
-		//req.Param("sign", "")
-		//req.Param("extid", "")
-		//req.Param("timing_time", datetime)
+		req.Param("username", username)
+		req.Param("userpwd", userpwd)
+		req.Param("mobiles", mobiles)
+		req.Param("content", content)
+		req.Param("sign", "")
+		req.Param("extid", "")
+		req.Param("timing_time", datetime)
 
 		fmt.Println(username, userpwd, mobiles, content, sign, datetime)
 
@@ -186,7 +185,7 @@ func (c *SmsController) SendMessage() {
 		}
 		fmt.Println("--->" + str)
 
-		str = "{\"code\":0,\"msgid\":"+ time.Now().String()[len(time.Now().String())-5: len(time.Now().String())] +",\"message\":\"发送成功，本次发送短信 " + strconv.Itoa(count) + " 条！\"}"
+		//str = "{\"code\":0,\"msgid\":"+ time.Now().String()[len(time.Now().String())-5: len(time.Now().String())] +",\"message\":\"发送成功，本次发送短信 " + strconv.Itoa(count) + " 条！\"}"
 
 		// 写入消息主体表格
 		sms := make([]models.Sms, 1)
