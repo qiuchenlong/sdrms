@@ -37,7 +37,7 @@ type SmsDetail struct {
 	SendState			int `json:"send_state"`    // 9、发送状态
 	SendDatetime		time.Time `json:"send_datetime"`  // 10、发送时间
 	ReportState			int `json:"report_state"`  // 11、报告状态
-	ReportDatetime		time.Time ` json:"report_datetime" orm:"auto_now_add;type(datetime)` // 12、报告状态
+	ReportDatetime		time.Time `json:"report_datetime" orm:"auto_now_add;type(datetime)"` // 12、报告状态
 
 	Sms					*Sms `orm:"rel(one)"` //`orm:"reverse(one)"`   // 2、发短信主体     一条消息 对应 多个明细
 
