@@ -22,7 +22,7 @@ func (c *BackendUserController) Prepare() {
 	//先执行
 	c.BaseController.Prepare()
 	//如果一个Controller的多数Action都需要权限控制，则将验证放到Prepare
-	//c.checkAuthor("DataGrid")
+	c.checkAuthor("DataGrid")
 	//如果一个Controller的所有Action都需要登录验证，则将验证放到Prepare
 	//权限控制里会进行登录验证，因此这里不用再作登录验证
 	c.checkLogin()
@@ -72,6 +72,7 @@ func (c *BackendUserController) Edit() {
 		}
 		o := orm.NewOrm()
 		o.LoadRelated(m, "RoleBackendUserRel")
+		o.LoadRelated(m, "ChannelBackendUserRel")
 	} else {
 		//添加用户时默认状态为启用
 		m.Status = enums.Enabled
@@ -83,6 +84,20 @@ func (c *BackendUserController) Edit() {
 		roleIds = append(roleIds, strconv.Itoa(item.Role.Id))
 	}
 	c.Data["roles"] = strings.Join(roleIds, ",")
+
+	// 获取关联的channelId列表
+	var channelIds []string
+	for _, channelItem := range m.ChannelBackendUserRel {
+		channelIds = append(channelIds, strconv.Itoa(channelItem.Channel.Id))
+	}
+	c.Data["channels"] = strings.Join(channelIds, ",")
+
+	if len(m.ChannelBackendUserRel) > 0 {
+		c.Data["price"] = m.ChannelBackendUserRel[0].Price
+	}
+
+	fmt.Println("------------------", m, roleIds, channelIds, m.ChannelBackendUserRel)
+
 	c.setTpl("backenduser/edit.html", "shared/layout_pullbox.html")
 	c.LayoutSections = make(map[string]string)
 	c.LayoutSections["footerjs"] = "backenduser/edit_footerjs.html"
@@ -99,6 +114,12 @@ func (c *BackendUserController) Save() {
 	if _, err := o.QueryTable(models.RoleBackendUserRelTBName()).Filter("backenduser__id", m.Id).Delete(); err != nil {
 		c.jsonResult(enums.JRCodeFailed, "删除历史关系失败", "")
 	}
+
+	//删除已关联的历史数据
+	//if _, err := o.QueryTable(models.ChannelBackendUserRelTBName()).Filter("backenduser__id", m.Id).Delete(); err != nil {
+	//	c.jsonResult(enums.JRCodeFailed, "删除历史关系失败", "")
+	//}
+
 	if m.Id == 0 {
 		//对密码进行加密
 		m.UserPwd = utils.String2md5(m.UserPwd)
@@ -130,16 +151,66 @@ func (c *BackendUserController) Save() {
 		relation := models.RoleBackendUserRel{BackendUser: &m, Role: &r}
 		relations = append(relations, relation)
 	}
+	fmt.Println("11111111111111111", relations)
 	if len(relations) > 0 {
 		//批量添加
 		if _, err := o.InsertMulti(len(relations), relations); err == nil {
-			c.jsonResult(enums.JRCodeSucc, "保存成功", m.Id)
+			//c.jsonResult(enums.JRCodeSucc, "保存成功", m.Id)
 		} else {
 			c.jsonResult(enums.JRCodeFailed, "保存失败", m.Id)
 		}
 	} else {
-		c.jsonResult(enums.JRCodeSucc, "保存成功", m.Id)
+		//c.jsonResult(enums.JRCodeSucc, "保存成功", m.Id)
 	}
+
+
+	m2 := models.ChannelBackendUserRel{}
+	o.QueryTable(models.ChannelBackendUserRelTBName()).Filter("backenduser__id", m.Id).One(&m2)
+
+	fmt.Println("ppppp", m, m2)
+
+	if m2.Id == 0 {
+		// 添加通道
+		var channelRelations []models.ChannelBackendUserRel
+		for _, channelId := range m.ChannelIds {
+			r := models.Channel{Id: channelId}
+			p := m.Price
+			channelRelation := models.ChannelBackendUserRel{BackendUser: &m, Channel: &r, Price: p}
+			channelRelations = append(channelRelations, channelRelation)
+		}
+		if len(channelRelations) > 0 {
+			//批量添加
+			if _, err := o.InsertMulti(len(channelRelations), channelRelations); err == nil {
+				c.jsonResult(enums.JRCodeSucc, "保存成功", m.Id)
+			} else {
+				c.jsonResult(enums.JRCodeFailed, "保存失败", m.Id)
+			}
+		} else {
+			c.jsonResult(enums.JRCodeSucc, "保存成功", m.Id)
+		}
+	} else {
+		// 更新通道
+		var channelRelations []models.ChannelBackendUserRel
+		for _, channelId := range m.ChannelIds {
+			r := models.Channel{Id: channelId}
+			channelRelation := models.ChannelBackendUserRel{BackendUser: &m, Channel: &r}
+			channelRelations = append(channelRelations, channelRelation)
+		}
+		if len(channelRelations) > 0 {
+			m2.Price = m.Price
+			fmt.Println("更新通道价格:", m.Price)
+			m2.Channel = channelRelations[0].Channel
+			fmt.Println(m2)
+			if _, err := o.Update(&m2); err == nil {
+				c.jsonResult(enums.JRCodeSucc, "保存成功", m.Id)
+			} else {
+				c.jsonResult(enums.JRCodeFailed, "保存失败", m.Id)
+			}
+		}
+	}
+
+
+
 }
 func (c *BackendUserController) Delete() {
 	strs := c.GetString("ids")

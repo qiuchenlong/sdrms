@@ -37,6 +37,8 @@ type BackendUser struct {
 	ChannelIds            []int                 `orm:"-" form:"ChannelIds"`
 	ChannelBackendUserRel []*ChannelBackendUserRel `orm:"reverse(many)"` // 设置一对多的反向关系
 
+	Price            float32                 `orm:"-" form:"Price"`
+
 }
 
 // BackendUserPageList 获取分页数据

@@ -68,10 +68,10 @@
         });
         var editable4Seq = false
         if ('{{.canEdit}}' === 'true') {
-          editable4Seq = rms.getEditableParam('{{urlfor "ChannelController.UpdateSeq"}}', null, true);
+          editable4Seq = rms.getEditableParam('{{urlfor "DepositController.UpdateSeq"}}', null, true);
         }  
         $ctrl.bootstrapTable({
-            url: '{{ urlfor "ChannelController.DataGrid"}}',
+            url: '{{ urlfor "DepositController.DataGrid"}}',
             method: 'post',
             sidePagination: 'server', //服务器端用 server
             idField: 'Id',
@@ -110,8 +110,8 @@
                 align: 'center',
                 sortable: true,
             }, {
-                field: 'name',
-                title: '名称',            
+                field: 'BackendUser.UserName',
+                title: '账户',
                 formatter: function(value,row,index){
                   return sdtheme.showlongstr(value)
                 },
@@ -119,27 +119,50 @@
                     return { classes: 'ellipsis' };
                 }
             }, {
-                field: 'code',
-                title: '编码'
+                field: 'Channel.name',
+                title: '通道'
             }, {
-                field: 'price',
-                title: '价格(元)'     
-            }, {
-                field: 'operate',
-                title: '操作',
-                width: '80px',
-                align: 'center',
+                field: 'Type',
+                title: '收款方式',
                 formatter: function (value, row, index) {
-                    var ret = [];
-                    ret.push('<div class="btn-group">')
-                    if ('{{.canEdit}}' === 'true') {
-                        ret.push('<button class="btn btn-primary btn-xs"  onclick="EditFun(' + row.Id + ')">' +
-                            '<i class="fa fa-pencil"></i> 编辑</button>');
-                    }                    
-                    ret.push('</div>')
-                    return ret.join('');
+                    let type = ""
+                    if (row.Type == 1) {
+                        type = "支付宝"
+                    } else {
+                        type = "微信"
+                    }
+                    return type
                 }
-            }],
+            }, {
+                field: 'BeforeMoney',
+                title: '充值前的金额(元)'
+            }, {
+                field: 'Money',
+                title: '充值的金额(元)'
+            }, {
+                field: 'AfterMoney',
+                title: '充值后的金额(元)'
+            }, {
+                field: 'Remarks',
+                title: '备注'
+            }
+            {{/*, {*/}}
+                {{/*field: 'operate',*/}}
+                {{/*title: '操作',*/}}
+                {{/*width: '80px',*/}}
+                {{/*align: 'center',*/}}
+                {{/*formatter: function (value, row, index) {*/}}
+                    {{/*var ret = [];*/}}
+                    {{/*ret.push('<div class="btn-group">')*/}}
+                    {{/*if ('{{.canEdit}}' === 'true') {*/}}
+                        {{/*ret.push('<button class="btn btn-primary btn-xs"  onclick="EditFun(' + row.Id + ')">' +*/}}
+                            {{/*'<i class="fa fa-pencil"></i> 编辑</button>');*/}}
+                    {{/*}*/}}
+                    {{/*ret.push('</div>')*/}}
+                    {{/*return ret.join('');*/}}
+                {{/*}*/}}
+            {{/*}*/}}
+            ],
             onLoadSuccess: function (data) {                
             },
             onCheckAll: function (rows) {
@@ -165,12 +188,12 @@
         if (Id > 0) {
             title = "编辑通道"
         }
-        var url = '{{ urlfor "ChannelController.Edit"}}' + '/' + Id;
+        var url = '{{ urlfor "DepositController.Edit"}}' + '/' + Id;
         window.location.href = url        
     }
 
     function DeleteFun() {
-        var url = '{{ urlfor "ChannelController.Delete"}}';
+        var url = '{{ urlfor "DepositController.Delete"}}';
         var rows = $dataGrid.bootstrapTable("getSelections")
         if (rows.length === 0) {
             layer.alert('请选择想要删除的项', { icon: 0, title: '提示' });

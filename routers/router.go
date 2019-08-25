@@ -9,12 +9,12 @@ import (
 func init() {
 
 	//课程路由
-	//beego.Router("/course/index", &controllers.CourseController{}, "*:Index")
-	//beego.Router("/course/datagrid", &controllers.CourseController{}, "Get,Post:DataGrid")
-	//beego.Router("/course/edit/?:id", &controllers.CourseController{}, "Get,Post:Edit")
-	//beego.Router("/course/delete", &controllers.CourseController{}, "Post:Delete")
-	//beego.Router("/course/updateseq", &controllers.CourseController{}, "Post:UpdateSeq")
-	//beego.Router("/course/uploadimage", &controllers.CourseController{}, "Post:UploadImage")
+	beego.Router("/course/index", &controllers.CourseController{}, "*:Index")
+	beego.Router("/course/datagrid", &controllers.CourseController{}, "Get,Post:DataGrid")
+	beego.Router("/course/edit/?:id", &controllers.CourseController{}, "Get,Post:Edit")
+	beego.Router("/course/delete", &controllers.CourseController{}, "Post:Delete")
+	beego.Router("/course/updateseq", &controllers.CourseController{}, "Post:UpdateSeq")
+	beego.Router("/course/uploadimage", &controllers.CourseController{}, "Post:UploadImage")
 
 	//用户角色路由
 	beego.Router("/role/index", &controllers.RoleController{}, "*:Index")
@@ -61,13 +61,29 @@ func init() {
 	beego.Router("/home/error/?:error", &controllers.HomeController{}, "*:Error")
 
 
+	// 短信列表
 	beego.Router("/sms/index", &controllers.SmsController{}, "*:Index")
-	beego.Router("/sms/send", &controllers.SmsController{}, "*:SendMessage")
-	beego.Router("/sms/sendlist", &controllers.SmsController{}, "*:SmsList")
 	beego.Router("/sms/smsdatagrid", &controllers.SmsController{}, "Post:SmsDataGrid")
-	beego.Router("/sms/postmessagestatus", &controllers.SmsController{}, "Post:PostMessageState")
+
+	// 发送短信
+	beego.Router("/sms/send", &controllers.SmsController{}, "*:Send")
+	beego.Router("/sms/sendMessage", &controllers.SmsController{}, "*:SendMessage")
+
+	//beego.Router("/sms/postmessagestatus", &controllers.SmsController{}, "Post:PostMessageState")
+
+	// 短信明细列表
+	beego.Router("/sms/detail/?:id", &controllers.SmsController{}, "Get,Post:Detail")
+	beego.Router("/sms/smsdetaildatagrid", &controllers.SmsController{}, "Post:SmsDetailDataGrid")
+
+
+
+	beego.Router("/api/v1/sms/status", &controllers.ApiController{}, "Post:PostMessageState")
+
+
 
 	beego.Router("/sms/queryBalance", &controllers.BalanceController{}, "*:Index")
+	beego.Router("/sms/Platform/queryBalance", &controllers.BalanceController{}, "*:IndexAll")
+
 	beego.Router("/backenduser/loginlog", &controllers.BackendUserController{}, "*:LoginLog")
 	beego.Router("/backenduser/loginlogdatagrid", &controllers.BackendUserController{}, "Post:LoginLogDataGrid")
 	beego.Router("/backenduser/modifypassword", &controllers.BackendUserController{}, "*:ModifyPassword")
@@ -78,13 +94,14 @@ func init() {
 	beego.Router("/channel/datagrid", &controllers.ChannelController{}, "Get,Post:DataGrid")
 	beego.Router("/channel/edit/?:id", &controllers.ChannelController{}, "Get,Post:Edit")
 	beego.Router("/channel/delete", &controllers.ChannelController{}, "Post:Delete")
+	beego.Router("/channel/datalist", &controllers.ChannelController{}, "Post:DataList")
 
 
 
-	beego.Router("/channelbackenduser/index", &controllers.ChannelBackendUserController{}, "*:Index")
-	beego.Router("/channelbackenduser/datagrid", &controllers.ChannelBackendUserController{}, "Get,Post:DataGrid")
-	beego.Router("/channelbackenduser/edit/?:id", &controllers.ChannelBackendUserController{}, "Get,Post:Edit")
-	beego.Router("/channelbackenduser/delete", &controllers.ChannelBackendUserController{}, "Post:Delete")
+	beego.Router("/channelbackenduserto/index", &controllers.ChannelBackendUserToController{}, "*:Index")
+	beego.Router("/channelbackenduserto/datagrid", &controllers.ChannelBackendUserToController{}, "Get,Post:DataGrid")
+	beego.Router("/channelbackenduserto/edit/?:id", &controllers.ChannelBackendUserToController{}, "Get,Post:Edit")
+	beego.Router("/channelbackendusertp/delete", &controllers.ChannelBackendUserToController{}, "Post:Delete")
 
 
 	beego.Router("/sms/smsdatagridall", &controllers.SmsController{}, "Get:SmsDataGridAll")
@@ -92,6 +109,8 @@ func init() {
 
 	// 充值中心
 	beego.Router("/deposit/index", &controllers.DepositController{}, "*:Index")
+	beego.Router("/deposit/depositgrid", &controllers.DepositController{}, "Get,Post:DataGrid")
+	beego.Router("/deposit/edit/?:id", &controllers.DepositController{}, "Get,Post:Edit")
 
 
 	beego.Router("/", &controllers.HomeController{}, "*:Index")

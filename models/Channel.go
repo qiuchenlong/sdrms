@@ -18,10 +18,12 @@ type ChannelQueryParam struct {
 
 // 通道管理
 type Channel struct {
-	Id					int
+	Id					int    `form:"Id"`
 	Code    			string `json:"code"`    // 通道编码
 	Name	 			string `json:"name"`    // 通道名称
 	Price				float32 `json:"price"`   // 默认价格
+	ChannelBackendUserRel    []*ChannelBackendUserRel    `orm:"reverse(many)" json:"-"` // 设置一对多的反向关系
+
 	//Creator				*BackendUser `orm:"rel(fk)"` //设置一对多关系
 	//Msg					*Sms `orm:"rel(fk)"` //设置一对多关系
 }
@@ -47,6 +49,37 @@ func ChannelListPageList(params *ChannelQueryParam) ([]*Channel, int64) {
 	fmt.Println(params.Limit, params.Offset)
 	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
 	return data, total
+}
+
+
+// RolePageList 获取分页数据
+func ChannelPageList(params *ChannelQueryParam) ([]*Channel, int64) {
+	query := orm.NewOrm().QueryTable(ChannelTBName())
+	data := make([]*Channel, 0)
+	//默认排序
+	sortorder := "Id"
+	switch params.Sort {
+	case "Id":
+		sortorder = "Id"
+	case "Seq":
+		sortorder = "Seq"
+	}
+	if params.Order == "desc" {
+		sortorder = "-" + sortorder
+	}
+	query = query.Filter("name__istartswith", params.NameLike)
+	total, _ := query.Count()
+	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
+	return data, total
+}
+
+// ChannelDataList 获取角色列表
+func ChannelDataList(params *ChannelQueryParam) []*Channel {
+	params.Limit = -1
+	//params.Sort = "Seq"
+	params.Order = "asc"
+	data, _ := ChannelPageList(params)
+	return data
 }
 
 

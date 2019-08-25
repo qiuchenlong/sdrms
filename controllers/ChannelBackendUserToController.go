@@ -9,7 +9,7 @@ import (
 	"github.com/lhtzbj12/sdrms/utils"
 )
 
-type ChannelBackendUserController struct {
+type ChannelBackendUserToController struct {
 	BaseController
 }
 
@@ -21,7 +21,7 @@ type ChannelBackendUserController struct {
 //}
 
 //Prepare 参考beego官方文档说明
-func (c *ChannelBackendUserController) Prepare() {
+func (c *ChannelBackendUserToController) Prepare() {
 	//先执行
 	c.BaseController.Prepare()
 	//如果一个Controller的多数Action都需要权限控制，则将验证放到Prepare
@@ -32,13 +32,13 @@ func (c *ChannelBackendUserController) Prepare() {
 }
 
 
-func (c *ChannelBackendUserController) Index() {
+func (c *ChannelBackendUserToController) Index() {
 	//将页面左边菜单的某项激活
 	c.Data["activeSidebarUrl"] = c.URLFor(c.controllerName + "." + c.actionName)
 	c.setTpl()
 	c.LayoutSections = make(map[string]string)
-	c.LayoutSections["headcssjs"] = "channelbackenduser/index_headcssjs.html"
-	c.LayoutSections["footerjs"] = "channelbackenduser/index_footerjs.html"
+	c.LayoutSections["headcssjs"] = "channelbackenduserto/index_headcssjs.html"
+	c.LayoutSections["footerjs"] = "channelbackenduserto/index_footerjs.html"
 	//页面里按钮权限控制
 	c.Data["canEdit"] = c.checkActionAuthor("ChannelBackendUserController", "Edit")
 	c.Data["canDelete"] = c.checkActionAuthor("ChannelBackendUserController", "Delete")
@@ -47,7 +47,7 @@ func (c *ChannelBackendUserController) Index() {
 
 
 // DataGrid 课程管理首页 表格获取数据
-func (c *ChannelBackendUserController) DataGrid() {
+func (c *ChannelBackendUserToController) DataGrid() {
 	//直接反序化获取json格式的requestbody里的值
 	var params models.ChannelBackendUserQueryParam
 	json.Unmarshal(c.Ctx.Input.RequestBody, &params)
@@ -63,7 +63,7 @@ func (c *ChannelBackendUserController) DataGrid() {
 
 
 //Edit 添加、编辑课程界面
-func (c *ChannelBackendUserController) Edit() {
+func (c *ChannelBackendUserToController) Edit() {
 	if c.Ctx.Request.Method == "POST" {
 		c.Save()
 	}
@@ -107,16 +107,16 @@ func (c *ChannelBackendUserController) Edit() {
 	c.Data["c"] = channels
 
 
-	c.setTpl("channelbackenduser/edit.html", "shared/layout_page.html")
+	c.setTpl("channelbackenduserto/edit.html", "shared/layout_page.html")
 	c.LayoutSections = make(map[string]string)
-	c.LayoutSections["headcssjs"] = "channelbackenduser/edit_headcssjs.html"
-	c.LayoutSections["footerjs"] = "channelbackenduser/edit_footerjs.html"
+	c.LayoutSections["headcssjs"] = "channelbackenduserto/edit_headcssjs.html"
+	c.LayoutSections["footerjs"] = "channelbackenduserto/edit_footerjs.html"
 
 	//将页面左边菜单的某项激活
-	c.Data["activeSidebarUrl"] = c.URLFor("ChannelBackendUserController.Index")
+	c.Data["activeSidebarUrl"] = c.URLFor("ChannelBackendUserToController.Index")
 }
 
-func (c* ChannelBackendUserController) Save() {
+func (c* ChannelBackendUserToController) Save() {
 	var err error
 	m := models.ChannelBackendUserFrom{}
 	//获取form里的值
@@ -152,7 +152,7 @@ func (c* ChannelBackendUserController) Save() {
 
 
 ////Delete 批量删除
-//func (c *ChannelBackendUserController) Delete() {
+//func (c *ChannelBackendUserToController) Delete() {
 //	strs := c.GetString("ids")
 //	ids := make([]int, 0, len(strs))
 //	for _, str := range strings.Split(strs, ",") {

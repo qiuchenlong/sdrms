@@ -11,6 +11,7 @@
     function pageInit(){
         //角色下拉框初始化
         roleSelectInit('{{.roles}}');
+        channelSelectInit('{{.channels}}')
         //附值
         $("#IsSuper").selectpicker('val','{{.m.IsSuper}}');
         $("#Status").selectpicker('val','{{.m.Status}}'); 
@@ -37,6 +38,28 @@
             }
         });
     }
+
+    //通道下拉框初始化
+    function channelSelectInit(selecteds){
+        var url = '{{urlfor "ChannelController.DataList"}}';
+        var $select =$("#Channels");
+        $select.html('');
+        $.sdpost(url,{},function(re){
+            if(re.code === 0){
+                var html=[]
+                $(re.obj).each(function(i,e){
+                    html.push('<option value="' + e.Id + '">' + e.name + '</option>')
+                });
+                $select.html(html.join(''));
+                $select.selectpicker({liveSearch:true});
+                $select.selectpicker('val',selecteds.split(','));
+            }
+            else{
+                layer.alert("获取数据失败",{icon:2,title:'失败'})
+            }
+        });
+    }
+
     //正则表达式验证
     jQuery.validator.methods.mobile = function (value, element, param) {
         //如果为空，直接过

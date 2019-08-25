@@ -26,8 +26,8 @@
                 <label>邮箱</label>
                 <input type="text" name="Email" class="form-control" placeholder="" value="{{.m.Email}}">
             </div>
-        </div>       
-    </div>      
+        </div>
+    </div>
     <div class="row">
         <div class="col-md-6">
             <div class="form-group">
@@ -63,6 +63,28 @@
             </div>
         </div>
     </div>
+
+    <div class="row">
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>通道</label>
+                <select name="ChannelIds" id="Channels" class="form-control" required>
+                </select>
+            </div>
+        </div>
+        <div class="col-md-6">
+            <div class="form-group">
+                <label>价格</label>
+                <div class="input-group">
+                    <div class="input-group-addon">¥</div>
+                    <input type="text" name="Price" class="form-control" placeholder="数字，最多两位小数" value="{{.price}}" max="999999" onchange="toFixed(this)" required>
+
+                </div>
+            </div>
+        </div>
+    </div>
+
+
 
 </form>
 </div>

@@ -73,7 +73,7 @@
                 // params.Address =$.trim($('.searchForm input[name="Address"]').val());
                 // params.Address =$.trim($('.searchForm input[name="Address"]').val());
                 // params.RealNameLike = $.trim($('.searchForm input[name="RealName"]').val());
-                // params.Mobile = $.trim($('.searchForm input[name="Mobile"]').val());
+                params.Mobile = $.trim($('.searchForm input[name="Mobile"]').val());
                 // params.SearchStatus = $('.searchForm select[name="Status"]').selectpicker('val');
                 return params;
             },
@@ -96,47 +96,47 @@
                 return {'data-pk': row.Id}
             },
             columns: [{
-                field: 'Sms.Id',
+                field: 'Id',
                 title: 'ID',
                 width: '90px',
                 align: 'center',
                 sortable: true,
             }, {
-                field: 'Id',
-                title: 'MsgID',
+                field: 'Creator.UserName',
+                title: '客户',
             }, {
-                field: 'mobile',
-                title: '手机号',
+                field: 'sign',
+                title: '短信签名',
             }, {
-                field: 'Sms.content',
-                title: '内容',
+                field: 'content',
+                title: '短信内容',
             }, {
-                field: 'Sms.Channel.name',
-                title: '通道',
+                field: 'message',
+                title: '总数',
+                formatter: function (value, row, index) {
+                    return value.replace(/[^0-9]/ig,"")
+                }
             }, {
-                field: 'submit_state',
-                title: '提交状态',
+                field: 'state',
+                title: '状态',
                 formatter:sdtheme.showsuccess,
             }, {
-                field: 'submit_datetime',
-                title: '提交时间',
+                field: 'datetime',
+                title: '定时时间',
+                sortable: true
             }, {
-                field: 'send_state',
-                title: '发送状态',
-                formatter:sdtheme.showsuccess,
-            }, {
-                field: 'send_datetime',
-                title: '发送时间',
-            }, {
-                field: 'report_state',
-                title: '发送状态',
-                formatter:sdtheme.showsuccess,
-            }, {
-                field: 'report_datetime',
-                title: '回调时间',
-            }, {
-                field: 'Sms.Creator.UserName',
-                title: '账户',
+                field: 'operate',
+                title: '操作',
+                width: '150px',
+                formatter: function (value, row, index) {
+                    var ret = [];
+                    {{/*if ('{{.canEdit}}' === 'true') {*/}}
+                        ret.push('<div style="float:left">')
+                        ret.push('<button class="btn btn-primary btn-xs"  onclick="QueryDetail(' + row.Id + ')"><i class="fa fa-pencil"></i> 明细</button>');
+                        ret.push('</div>')
+                    // }
+                    return ret.join('');
+                }
             }],
             onLoadSuccess: function (data) {
             },
@@ -170,27 +170,27 @@
         return "";
     }
 
-    function EditFun(Id) {
-        var title = '添加用户';
+    function QueryDetail(Id) {
+        var title = '查看明细';
         if (Id > 0) {
-            title = "编辑用户"
+            title = "查看明细"
         }
-        var url = '{{ urlfor "BackendUserController.Edit"}}' + '/' + Id;
+        var url = '{{ urlfor "SmsController.Detail"}}' + '/' + Id;
         layer.open({
             type: 2,
-            title: title,
+            // title: title,
             shadeClose: false,
-            shade: 0.2,
+            shade: 0.2, // 阴影
             maxmin: true,
             shift: 1,
-            area: ['1000px', '600px'],
+            area: ['100%', '100%'],
             content: url,
-            btn: ['保存', '关闭'],
-            yes: function (index, layero) {
-                var iframeWin = window[layero.find('iframe')[0]['name']];
-                iframeWin.FormSubmit();
-            }
+            btn: ['关闭']
         });
+
+
+        {{/*var url = '{{ urlfor "SmsController.Detail"}}';*/}}
+        {{/*window.location.href = url;*/}}
     }
 
     function DeleteFun() {

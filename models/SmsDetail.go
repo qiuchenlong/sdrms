@@ -20,6 +20,8 @@ func (a *SmsDetail) TableName() string {
 type SmsDetailQueryParam struct {
 	BaseQueryParam
 	//NameLike string
+	Mobile       string //精确查询
+	SmsId        string `json:"sms_id"`
 }
 
 
@@ -31,11 +33,11 @@ type SmsDetail struct {
 	Corporator			string `json:"corporator"`   // 5、运营商
 	Location			string `json:"location"`   // 6、归属地
 	SubmitState    		int `json:"submit_state"`    // 7、提交状态
-	SubmitDatetime 		string `json:"submit_datetime"`  // 8、提交时间
+	SubmitDatetime 		time.Time `json:"submit_datetime"`  // 8、提交时间
 	SendState			int `json:"send_state"`    // 9、发送状态
-	SendDatetime		string `json:"send_datetime"`  // 10、发送时间
+	SendDatetime		time.Time `json:"send_datetime"`  // 10、发送时间
 	ReportState			int `json:"report_state"`  // 11、报告状态
-	ReportDatetime		string `json:"report_datetime"` // 12、报告状态
+	ReportDatetime		time.Time `json:"report_datetime"` // 12、报告状态
 
 	Sms					*Sms `orm:"rel(one)"` //`orm:"reverse(one)"`   // 2、发短信主体     一条消息 对应 多个明细
 
@@ -64,10 +66,10 @@ func SmsDetailBatchInsert(smsDetail []SmsDetail) (int64) { //, id *int
 	mobilelist := strings.Split(smsDetail[0].Mobile, ",")
 	fmt.Println(mobilelist)
 
-	execstring := "INSERT INTO rms_smsdetail (id, mobile, number, corporator, location, submit_state, submit_datetime, send_state, send_datetime, report_state, report_datetime, sms_id) VALUES" //creator_id
+	execstring := "INSERT INTO rms_smsdetail (mobile, number, corporator, location, submit_state, submit_datetime, send_state, send_datetime, report_state, report_datetime, sms_id) VALUES" //creator_id
 	data := ""
 
-	fmt.Println(time.Now().Unix())
+	fmt.Println(time.Now().Unix(), "!!!!!!!!!!!!!!!!!!", len(smsDetail), smsDetail)
 	for i := 0; i < 1; i++ {
 
 		//if i < len(MessageState) - 1 {
@@ -81,22 +83,21 @@ func SmsDetailBatchInsert(smsDetail []SmsDetail) (int64) { //, id *int
 
 		//fmt.Println("----->", &id)
 
-		for j := i * 10; j < i*10+len(smsDetail); j++ {
-			if j < i*10+(len(smsDetail)-1) {
+		for j := i * 10; j < i*10+len(mobilelist); j++ {
+			if j < i*10+(len(mobilelist)-1) {
 				//id := strconv.Itoa(j)
 				//onedata := "(" + id + ", '0', '20180103002930'), "
 
-				onedata := "('"+ strconv.Itoa(smsDetail[0].Id) +
-					"', '"+ mobilelist[j - i*10] +
+				onedata := "('"+ mobilelist[j - i*10] +
 					"', '"+ strconv.Itoa(smsDetail[0].Number) +
 					"', '"+ smsDetail[0].Corporator +
 					"', '"+ smsDetail[0].Location +
 					"', '"+ strconv.Itoa(smsDetail[0].SubmitState) +
-					"', '"+ smsDetail[0].SubmitDatetime +
+					"', '"+ smsDetail[0].SubmitDatetime.Format("2006-01-02 15:04:05") +
 					"', '"+ strconv.Itoa(smsDetail[0].SendState) +
-					"', '"+ smsDetail[0].SendDatetime +
+					"', '"+ smsDetail[0].SendDatetime.Format("2006-01-02 15:04:05") +
 					"', '"+ strconv.Itoa(smsDetail[0].ReportState) +
-					"', '"+ smsDetail[0].ReportDatetime +
+					"', '"+ smsDetail[0].ReportDatetime.Format("2006-01-02 15:04:05") +
 
 					"', '"+ strconv.Itoa(smsDetail[0].Sms.Id) +
 					"'), "
@@ -106,17 +107,16 @@ func SmsDetailBatchInsert(smsDetail []SmsDetail) (int64) { //, id *int
 				//onedata := "(" + id + ",'0', '20180103002930')"
 				//onedata := "('"+ messageState[j - i*10].Msgid +"', '1', '1', '1', '1')"
 
-				onedata := "('"+ strconv.Itoa(smsDetail[0].Id) +
-					"', '"+ mobilelist[j - i*10] +
+				onedata := "('"+ mobilelist[j - i*10] +
 					"', '"+ strconv.Itoa(smsDetail[0].Number) +
 					"', '"+ smsDetail[0].Corporator +
 					"', '"+ smsDetail[0].Location +
 					"', '"+ strconv.Itoa(smsDetail[0].SubmitState) +
-					"', '"+ smsDetail[0].SubmitDatetime +
+					"', '"+ smsDetail[0].SubmitDatetime.Format("2006-01-02 15:04:05") +
 					"', '"+ strconv.Itoa(smsDetail[0].SendState) +
-					"', '"+ smsDetail[0].SendDatetime +
+					"', '"+ smsDetail[0].SendDatetime.Format("2006-01-02 15:04:05") +
 					"', '"+ strconv.Itoa(smsDetail[0].ReportState) +
-					"', '"+ smsDetail[0].ReportDatetime +
+					"', '"+ smsDetail[0].ReportDatetime.Format("2006-01-02 15:04:05") +
 
 					"', '"+ strconv.Itoa(smsDetail[0].Sms.Id) +
 					"') "
@@ -160,21 +160,23 @@ func SmsDetailStateBatchUpdate(smsDetailState []SmsDetailState) (bool) {
 	db, err := sql.Open(db_type, dbconfig)
 	fmt.Println(err)
 
+	//UPDATE rms_smsdetail SET report_state = CASE sms_id WHEN (SELECT id From rms_sms WHERE msgid = 251342) THEN 0 END WHERE sms_id IN (SELECT id From rms_sms WHERE msgid = 251342);
+
 	ids := ""
 	execstring := "UPDATE rms_smsdetail SET "
-	execstring += "report_state = CASE id"
+	execstring += "report_state = CASE sms_id"
 	for _, value := range smsDetailState {
-		execstring += " WHEN " + value.Msgid + " THEN " + value.State + " "
-		ids += (value.Msgid + ",")
+		execstring += " WHEN (SELECT id From rms_sms WHERE msgid = " + value.Msgid + ") THEN " + value.State + " "
+		ids += ("(SELECT id From rms_sms WHERE msgid = " + value.Msgid + "),")
 	}
 	execstring += " END, "
-	execstring += "report_datetime = CASE id"
+	execstring += "report_datetime = CASE sms_id"
 	for _, value := range smsDetailState {
-		execstring += " WHEN " + value.Msgid + " THEN '" + value.Datetime + "' " //time.Now().Format("2006-01-02 15:04:05")
+		execstring += " WHEN (SELECT id From rms_sms WHERE msgid = " + value.Msgid + ") THEN '" + value.Datetime + "' " //time.Now().Format("2006-01-02 15:04:05")
 		//ids += (value.Msgid + ",")
 	}
 	execstring += " END "
-	execstring += " WHERE id IN (" + ids[0 : len(ids)-1] +")"
+	execstring += " WHERE sms_id IN (" + ids[0 : len(ids)-1] +")"
 
 	fmt.Println(execstring)
 
@@ -188,6 +190,57 @@ func SmsDetailStateBatchUpdate(smsDetailState []SmsDetailState) (bool) {
 }
 
 
+// CoursePageList 获取分页数据
+func SmsDetailListByUserPageList(params *SmsDetailQueryParam, id *int) ([]*SmsDetail, int64) {
+	query := orm.NewOrm().QueryTable(SmsDetailTBName())
+	data := make([]*SmsDetail, 0)
+	//默认排序
+	sortorder := "submit_datetime"
+	switch params.Sort {
+	case "Id":
+		sortorder = "Id"
+		//case "Seq":
+		//	sortorder = "Seq"
+	}
+	if params.Order == "desc" {
+		sortorder = "-" + sortorder
+	}
+	// .Filter("Creator", &id)
+	query = query.RelatedSel().Filter("Sms__Creator__Id", id)//"name__istartswith", params.NameLike
+	//query = query.Filter("submit_datetime__istartswith", time.Now().Format("2006-01-02")).RelatedSel()
+	if len(params.Mobile) > 0 {
+		query = query.Filter("mobile", params.Mobile)
+	}
+	total, _ := query.Count()
+	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
+	return data, total
+}
+
+// CoursePageList 获取分页数据
+func SmsDetailListPageList(params *SmsDetailQueryParam) ([]*SmsDetail, int64) {
+	query := orm.NewOrm().QueryTable(SmsDetailTBName())
+	data := make([]*SmsDetail, 0)
+	//默认排序
+	sortorder := "submit_datetime"
+	switch params.Sort {
+	case "Id":
+		sortorder = "Id"
+		//case "Seq":
+		//	sortorder = "Seq"
+	}
+	if params.Order == "desc" {
+		sortorder = "-" + sortorder
+	}
+	// .Filter("Creator", &id)
+	query = query.Filter("sms_id", params.SmsId).RelatedSel()//"name__istartswith", params.NameLike
+	//query = query.Filter("submit_datetime__istartswith", time.Now().Format("2006-01-02")).RelatedSel()
+	if len(params.Mobile) > 0 {
+		query = query.Filter("mobile", params.Mobile)
+	}
+	total, _ := query.Count()
+	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
+	return data, total
+}
 
 
 // CoursePageList 获取分页数据
@@ -207,8 +260,11 @@ func SmsDetailAllListPageList(params *SmsDetailQueryParam) ([]*SmsDetail, int64)
 	}
 	// .Filter("Creator", &id)
 	query = query.Filter("submit_datetime__istartswith", time.Now().Format("2006-01-02")).RelatedSel() //"name__istartswith", params.NameLike
+	//fmt.Println(params.Mobile)
+	//if len(params.Mobile) > 0 {
+	//	query = query.Filter("mobile", params.Mobile)
+	//}
 	total, _ := query.Count()
-	fmt.Println(params.Limit, params.Offset)
 	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
 	return data, total
 }

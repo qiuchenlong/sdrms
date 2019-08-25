@@ -8,6 +8,13 @@
     //初始化加载
     $(function () {
         pageInit();
+
+        // $("body").hide()
+        $(".main-header").hide()
+        $(".main-sidebar").hide()
+        $(".main-footer").hide()
+
+        $(".content-wrapper").css("margin-left", 0)
     });
 
     //初始化页面
@@ -63,17 +70,19 @@
           $(this).bootstrapTable('extendCustomOption', { hlpk: null })
         });
         $ctrl.bootstrapTable({
-            url: '{{ urlfor "BackendUserController.DataGrid"}}',
+            url: '{{ urlfor "SmsController.SmsDetailDataGrid"}}',
             method: 'post',
             sidePagination: 'server', //服务器端用 server
             idField: 'Id',
             queryParamsType: 'limit',
             queryParams: function (params) {
                 //params的自带参数类型由queryParamsType决定
-                params.UserNameLike =$.trim($('.searchForm input[name="UserName"]').val());
-                params.RealNameLike = $.trim($('.searchForm input[name="RealName"]').val());
+                // params.Address =$.trim($('.searchForm input[name="Address"]').val());
+                // params.Address =$.trim($('.searchForm input[name="Address"]').val());
+                // params.RealNameLike = $.trim($('.searchForm input[name="RealName"]').val());
                 params.Mobile = $.trim($('.searchForm input[name="Mobile"]').val());
-                params.SearchStatus = $('.searchForm select[name="Status"]').selectpicker('val');           
+                params.sms_id = getPar();
+                // params.SearchStatus = $('.searchForm select[name="Status"]').selectpicker('val');
                 return params;
             },
             pagination: true,
@@ -95,54 +104,51 @@
                 return {'data-pk': row.Id}
             },
             columns: [{
-                field: 'state',
-                checkbox: true,
-                radio: false,
-            }, {
-                field: 'Id',
-                title: 'ID',
+                field: 'Sms.msgid',
+                title: 'MsgID',
                 width: '90px',
                 align: 'center',
                 sortable: true,
-            }, {
-                field: 'UserName',
-                title: '用户名',                     
-            }, {
-                field: 'RealName',
-                title: '姓名',                     
-            }, {
-                field: 'IsSuper',
-                title: '是否超级管理员',
-                formatter: sdtheme.showyes                     
-            }, {
-                field: 'Mobile',
-                title: '手机号',                     
             // }, {
-            //     field: 'Channel.name',
-            //     title: '通道',
+            //     field: 'Id',
+            //     title: 'ID',
             }, {
-                field: 'Status',
-                title: '状态',   
-                formatter:sdtheme.showenable,                  
+                field: 'mobile',
+                title: '手机号',
             }, {
-                field: 'operate',
-                title: '操作',
-                width: '150px',
-                formatter: function (value, row, index) {
-                    var ret = [];
-                    if ('{{.canEdit}}' === 'true') {
-                        ret.push('<div style="float:left">')
-                        ret.push('<button class="btn btn-primary btn-xs"  onclick="EditFun(' + row.Id + ')"><i class="fa fa-pencil"></i> 编辑</button>');
-                        ret.push('</div>')
-                        ret.push('<div style="float:left; margin-left: 20px;">')
-                        ret.push('<button class="btn btn-primary btn-xs"  onclick="AddBalance(' + row.Id + ')"><i class="fa fa-pencil"></i> 充值</button>');
-                        ret.push('</div>')
-                    }
-                    return ret.join('');
-                }
+                field: 'Sms.content',
+                title: '内容',
+            }, {
+                field: 'Sms.Channel.name',
+                title: '通道',
+            }, {
+                field: 'submit_state',
+                title: '提交状态',
+                formatter:sdtheme.showsuccess,
+            }, {
+                field: 'submit_datetime',
+                title: '提交时间',
+                sortable: true
+            }, {
+                field: 'send_state',
+                title: '发送状态',
+                formatter:sdtheme.showsuccess,
+            }, {
+                field: 'send_datetime',
+                title: '发送时间',
+            }, {
+                field: 'report_state',
+                title: '发送状态',
+                formatter:sdtheme.showsuccess,
+            }, {
+                field: 'report_datetime',
+                title: '回调时间',
+            }, {
+                field: 'Sms.Creator.UserName',
+                title: '账户',
             }],
-            onLoadSuccess: function (data) {                
-            },            
+            onLoadSuccess: function (data) {
+            },
             onCheckAll: function (rows) {
               $(".table-btn-check-enable").prop('disabled', false);
             },
@@ -196,29 +202,6 @@
         });
     }
 
-    function AddBalance(Id) {
-        var title = '充值余额';
-        if (Id > 0) {
-            title = "充值余额"
-        }
-        var url = '{{ urlfor "DepositController.Edit"}}' + '/' + Id;
-        layer.open({
-            type: 2,
-            title: title,
-            shadeClose: false,
-            shade: 0.2,
-            maxmin: true,
-            shift: 1,
-            area: ['1000px', '600px'],
-            content: url,
-            btn: ['保存', '关闭'],
-            yes: function (index, layero) {
-                var iframeWin = window[layero.find('iframe')[0]['name']];
-                iframeWin.FormSubmit();
-            }
-        });
-    }
-
     function DeleteFun() {
         var url = '{{ urlfor "BackendUserController.Delete"}}';
         var rows = $dataGrid.bootstrapTable("getSelections")
@@ -244,6 +227,33 @@
                 }
             });
         });
+    }
+
+
+    function getPar(){ //par
+        //获取当前URL
+        // var local_url = document.location.href;
+        // //获取要取得的get参数位置
+        // var get = local_url.indexOf(par +"=");
+        // if(get == -1){
+        //     return false;
+        // }
+        // //截取字符串
+        // var get_par = local_url.slice(par.length + get + 1);
+        // //判断截取后的字符串是否还有其他get参数
+        // var nextPar = get_par.indexOf("&");
+        // if(nextPar != -1){
+        //     get_par = get_par.slice(0, nextPar);
+        // }
+        // return get_par;
+
+        let get_par = 0;
+        var local_url = document.location.href;
+        var nextPar = local_url.lastIndexOf("/");
+        if(nextPar != -1){
+            get_par = local_url.slice(nextPar + 1, local_url.length);
+        }
+        return get_par;
     }
 
 </script>

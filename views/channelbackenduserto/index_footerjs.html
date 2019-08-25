@@ -68,10 +68,10 @@
         });
         var editable4Seq = false
         if ('{{.canEdit}}' === 'true') {
-          editable4Seq = rms.getEditableParam('{{urlfor "ChannelBackendUserController.UpdateSeq"}}', null, true);
+          editable4Seq = rms.getEditableParam('{{urlfor "ChannelBackendUserToController.UpdateSeq"}}', null, true);
         }  
         $ctrl.bootstrapTable({
-            url: '{{ urlfor "ChannelBackendUserController.DataGrid"}}',
+            url: '{{ urlfor "ChannelBackendUserToController.DataGrid"}}',
             method: 'post',
             sidePagination: 'server', //服务器端用 server
             idField: 'Id',
@@ -127,22 +127,23 @@
             }, {
                 field: 'balance',
                 title: '余额(元)'
-            }, {
-                field: 'operate',
-                title: '操作',
-                width: '80px',
-                align: 'center',
-                formatter: function (value, row, index) {
-                    var ret = [];
-                    ret.push('<div class="btn-group">')
-                    if ('{{.canEdit}}' === 'true') {
-                        ret.push('<button class="btn btn-primary btn-xs"  onclick="EditFun(' + row.Id + ')">' +
-                            '<i class="fa fa-pencil"></i> 编辑</button>');
-                    }                    
-                    ret.push('</div>')
-                    return ret.join('');
-                }
-            }],
+            {{/*}, {*/}}
+                {{/*field: 'operate',*/}}
+                {{/*title: '操作',*/}}
+                {{/*width: '80px',*/}}
+                {{/*align: 'center',*/}}
+                {{/*formatter: function (value, row, index) {*/}}
+                    {{/*var ret = [];*/}}
+                    {{/*ret.push('<div class="btn-group">')*/}}
+                    {{/*if ('{{.canEdit}}' === 'true') {*/}}
+                        {{/*ret.push('<button class="btn btn-primary btn-xs"  onclick="EditFun(' + row.Id + ')">' +*/}}
+                            {{/*'<i class="fa fa-pencil"></i> 编辑</button>');*/}}
+                    {{/*}                    */}}
+                    {{/*ret.push('</div>')*/}}
+                    {{/*return ret.join('');*/}}
+                {{/*}*/}}
+            }
+            ],
             onLoadSuccess: function (data) {                
             },
             onCheckAll: function (rows) {
@@ -168,7 +169,7 @@
         if (Id > 0) {
             title = "编辑通道"
         }
-        var url = '{{ urlfor "ChannelBackendUserController.Edit"}}' + '/' + Id;
+        var url = '{{ urlfor "ChannelBackendUserToController.Edit"}}' + '/' + Id;
         window.location.href = url        
     }
 

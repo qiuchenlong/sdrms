@@ -64,6 +64,16 @@ func (c *ChannelController) DataGrid() {
 }
 
 
+//DataList 通道列表
+func (c *ChannelController) DataList() {
+	var params = models.ChannelQueryParam{}
+	//获取数据列表和总数
+	data := models.ChannelDataList(&params)
+	//定义返回的数据结构
+	c.jsonResult(enums.JRCodeSucc, "", data)
+}
+
+
 //Edit 添加、编辑课程界面
 func (c *ChannelController) Edit() {
 	if c.Ctx.Request.Method == "POST" {

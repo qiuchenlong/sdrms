@@ -31,9 +31,9 @@
             url: "/sms/smsdatagridall",
             data: "",
             success: function (result) {
-                console.log(result)
+                console.log(result);
                 // let res = JSON.parse(result)
-                $("#today_send_total").text(result.total)
+                $("#today_send_total").text(result.total);
 
                 let successNum = 0;
                 let i = 0;
@@ -42,7 +42,14 @@
                         successNum += 1
                     }
                 }
-                $("#today_send_success_bit").html(successNum/result.total*100 + "<sup style=\"font-size: 20px\">%</sup>")
+
+                let per = "";
+                if (result.total == 0) {
+                    per = 0;
+                } else {
+                    per = successNum/result.total*100;
+                }
+                $("#today_send_success_bit").html(per + "<sup style=\"font-size: 20px\">%</sup>")
                 $("#today_send_success_num").text(successNum)
             },
             error: function (error) {
@@ -98,7 +105,7 @@
                 </div>
             </div>
             <!-- ./col -->
-            <div class="col-lg-3 col-xs-6">
+            <div class="col-lg-3 col-xs-6" hidden>
                 <!-- small box -->
                 <div class="small-box bg-red">
                     <div class="inner">

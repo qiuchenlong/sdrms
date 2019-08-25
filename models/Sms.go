@@ -6,7 +6,6 @@ import (
 	"github.com/astaxie/beego"
 	"database/sql"
 	"github.com/astaxie/beego/orm"
-	"strings"
 	"strconv"
 )
 
@@ -20,22 +19,23 @@ func (a *Sms) TableName() string {
 type SmsQueryParam struct {
 	BaseQueryParam
 	//NameLike string
+
 }
 
 type Sms struct {
 	Id					int                     // 1、主键
-	Mobile	 			string `json:"mobile"`
-	Content				string `json:"content"`
+	//Mobile	 			string `json:"mobile"`
+	Content				string `json:"content"`  // 6、内容
 	Sign				string `json:"sign"`   // 5、短信签名
-	State    			int `json:"state"`   // 6、状态
-	Datetime 			string `json:"datetime"`  // 7、提交时间
+	State    			int `json:"state"`   // 7、状态
+	Datetime 			string `json:"datetime"`  // 8、提交时间
 	Creator				*BackendUser `orm:"rel(fk)"` //设置一对多关系   一个用户 对应 多条短信  2、用户
 	Channel				*Channel `orm:"rel(fk)"`  //设置一对多关系   一个通道 对应 多条短信  3、通道
 	Price               float32 `json:"price"`   // 价格  4、价格
 
-	Code				int `json:"code"` // 8、返回码
-	Message				string `json:"message"`  // 9、返回消息
-	Msgid    			int `json:"msgid"`  // 10、msgid
+	Code				int `json:"code"` // 9、返回码
+	Message				string `json:"message"`  // 10、返回消息
+	Msgid    			int `json:"msgid"`  // 11、msgid
 
 	//MsgState 			*MessaeState `orm:"rel(one)"` // 设置一对多的反向关系
 
@@ -67,28 +67,7 @@ func SmsListPageList(params *SmsQueryParam, id *int) ([]*Sms, int64) {
 
 
 
-// CoursePageList 获取分页数据
-func SmsDetailListPageList(params *SmsDetailQueryParam, id *int) ([]*SmsDetail, int64) {
-	query := orm.NewOrm().QueryTable(SmsDetailTBName())
-	data := make([]*SmsDetail, 0)
-	//默认排序
-	sortorder := "Id"
-	switch params.Sort {
-	case "Id":
-		sortorder = "Id"
-		//case "Seq":
-		//	sortorder = "Seq"
-	}
-	if params.Order == "desc" {
-		sortorder = "-" + sortorder
-	}
-	// .Filter("Creator", &id)
-	query = query.RelatedSel().Filter("Sms__Creator__Id", id)//"name__istartswith", params.NameLike
-	total, _ := query.Count()
-	fmt.Println(params.Limit, params.Offset)
-	query.OrderBy(sortorder).Limit(params.Limit, params.Offset).All(&data)
-	return data, total
-}
+
 
 
 //func SmsListPageList2(params *SmsQueryParam, id *int) ([]*MessageState, int64) {
@@ -131,11 +110,11 @@ func SmsBatchInsert(sms []Sms) (int64) {
 	fmt.Println(err)
 
 
-	mobilelist := strings.Split(sms[0].Mobile, ",")
-	fmt.Println(mobilelist)
+	//mobilelist := strings.Split(sms[0].Mobile, ",")
+	//fmt.Println(mobilelist)
 
 
-	execstring := "INSERT INTO rms_sms (mobile, content, sign, state, datetime, creator_id, channel_id, price, code, message, msgid)VALUES"
+	execstring := "INSERT INTO rms_sms (content, sign, state, datetime, creator_id, channel_id, price, code, message, msgid)VALUES"
 	data := ""
 
 	fmt.Println(time.Now().Unix())
@@ -150,10 +129,9 @@ func SmsBatchInsert(sms []Sms) (int64) {
 		//}
 
 
-		for j := i * 10; j < i*10+len(mobilelist); j++ {
-			if j < i*10+(len(mobilelist)-1) {
-				onedata := "('"+ mobilelist[j - i*10] +
-					"', '"+ sms[0].Content +
+		for j := i * 10; j < i*10+len(sms); j++ {
+			if j < i*10+(len(sms)-1) {
+				onedata := "('"+ sms[0].Content +
 					"', '"+ sms[0].Sign +
 					"', '"+ strconv.Itoa(sms[0].State) +
 					"', '"+ sms[0].Datetime +
@@ -167,8 +145,7 @@ func SmsBatchInsert(sms []Sms) (int64) {
 					"'), "
 				data = data + onedata
 			} else {
-				onedata := "('"+ mobilelist[j - i*10] +
-					"', '"+ sms[0].Content +
+				onedata := "('"+ sms[0].Content +
 					"', '"+ sms[0].Sign +
 					"', '"+ strconv.Itoa(sms[0].State) +
 					"', '"+ sms[0].Datetime +

@@ -17,6 +17,9 @@ type ChannelBackendUserRel struct {
 	Balance				float32 			`json:"balance"`   // 余额
 	State       		int 			`json:"state"` // 状态
 	Created     		time.Time    	`orm:"auto_now_add;type(datetime)"`
+
+	Hit					int				`orm:"hit" json:"hit"`   // 增加余额的时候，hit = 1， 结束的时候，hit = 0，为0才可发送短信
+
 }
 
 
@@ -73,6 +76,18 @@ func ChannelBackendUserOne(id int) (*ChannelBackendUserRel, error) {
 	o := orm.NewOrm()
 	m := ChannelBackendUserRel{Id: id}
 	err := o.Read(&m)
+	if err != nil {
+		return nil, err
+	}
+	return &m, nil
+}
+
+
+
+// BackendUserOne 根据id获取单条
+func ChannelBackendUserByUserOne(userid int) (*ChannelBackendUserRel, error) {
+	m := ChannelBackendUserRel{}
+	err := orm.NewOrm().QueryTable(ChannelBackendUserRelTBName()).Filter("backend_user_id", userid).One(&m)
 	if err != nil {
 		return nil, err
 	}
