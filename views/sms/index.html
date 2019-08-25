@@ -1,149 +1,73 @@
 <!-- Content Header (Page header) -->
 <section class="content-header">
     <h1>
-        发送短信
-        <small>发送短信</small>
-    </h1> 
+        发送状态查询
+        <small>发送状态查询</small>
+    </h1>
+    <ol class="breadcrumb">
+        <li>
+            <a href="{{urlfor "HomeController.Index"}}">
+                <i class="fa fa-dashboard"></i> 首页</a>
+        </li>
+        <li class="active">发送状态查询</li>
+    </ol>
 </section>
 <!-- Main content -->
 <section class="content container-fluid">
-
-
-
     <!-- 页面内容开始 -->
     <div class="row">
         <div class="col-md-12">
-            <div class="form-group">
-                <label>手机号</label>
-                <!-- <input type="text" id="mobiles" name="Mobiles" class="form-control" placeholder="最大10000个，号码之间以英文逗号,分隔" value="{{.m.UserName}}"> -->
+            <form id="searchForm" class="searchForm">
+                <div class="box box-solid collapsed-box">
+                    <div class="box-header with-border">
+                        <input type="text" name="UserName" class="form-control pull-left input-wd-md" placeholder="用户名" style="display: none">
+                        <input type="text" name="RealName" class="form-control pull-left input-wd-md" placeholder="姓名" style="display: none">
 
-                <textarea id="mobiles" name="Mobiles" class="form-control required" placeholder="直接输入手机号码，以回车键间隔" style="height: 300px"></textarea>
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <label>短信内容</label>
-                <input type="text" id="content" name="Content" class="form-control" placeholder="短信不超过63个字符，超过则按照2条计价">
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <label>签名</label>
-                <input type="text" id="sign" name="Sign" class="form-control" placeholder="可以为空">
-            </div>
-        </div>
-        <div class="col-md-12">
-            <div class="form-group">
-                <label>发送定时时间</label>
-                <!--指定 date标记-->
-                <div class="input-group date">
-                    <input type="text" class="form-control" id="datetimepicker"/>
-                    {{/*disabled="disabled"*/}}
-                    <span class="input-group-addon">
-                        <span class="glyphicon glyphicon-calendar"></span>
-                    </span>
+
+                        <input type="text" name="Mobile" class="form-control pull-left input-wd-md" placeholder="手机号">
+
+                        {{/*<div class="btn-group searchbtns">*/}}
+                            <button type="button" class="btn btn-warning" id="btnSearch"><i class="fa fa-search"></i> 搜索</button>
+                            <button type="button" class="btn btn-default" id="btnClearSearch"><i class="fa fa-eraser"></i> 清除</button>
+                        {{/*</div>*/}}
+                        <div class="box-tools pull-right" style="display: none">
+                            <button id="searchpanelbtn" type="button" class="btn btn-box-tool" data-widget="collapse"><i class="fa fa-plus"></i>
+                            </button>
+                        </div>
+                        <!-- /.box-tools -->
+                    </div>
+                    <!-- /.box-header -->
+                    <div class="box-body" style="display: none">
+                        <!-- 这里放更多的查询条件，当 box-body 里出更多查询条件时，右侧会出现展开/收缩的按钮-->
+                        <select name="Status" class="form-control bs-select" data-width="100px">
+                            <option value="">- 全部 -</option>
+                            <option value="-1">锁定</option>
+                            <option value="0">禁用</option>
+                            <option value="1">启用</option>
+                        </select>
+                    </div>
+                    <!-- /.box-body -->
                 </div>
-
+            </form>
+            <!-- /.searchForm -->
+            <div class="box box-solid">
+                <div class="box-body">
+                    <div class="btn-group" id="toolbar">
+                    {{ if .canEdit}}
+                        <button class="btn btn-info" href="javascript:;" onclick="EditFun(0)">
+                            <i class="fa fa-plus"></i> 添加</button>
+                    {{end}}
+                    {{ if .canDelete}}
+                        <button class="btn btn-danger table-btn-check-enable" disabled onclick="DeleteFun()">
+                            <i class="fa fa-trash"></i> 删除
+                        </button>
+                    {{end}}
+                    </div>
+                    <table id="dataGrid"></table>
+                </div>
             </div>
-        </div>
-        <div class="align-center">
-            <button type="button" class="btn btn-primary" onclick="sendMessage()">发送</button>
-            <button type="button" class="btn btn-default" onclick="returnList()" style="display: none">返回</button>
         </div>
     </div>
-
-
-    <!-- bootstrap样式表 -->
-
-    <!-- 时间选择器样式表 -->
-
-
-    <!-- jquery -->
-    <script src="/static/plugins/jquery-v3.3.1/jquery.min.js"></script>
-
-    <!-- bootstrap脚本 -->
-
-    <!-- 时间选择器前置脚本 -->
-    <script src="/static/plugins/moment-v2.22.1/moment-with-locales.min.js"></script>
-
-    <!-- 时间选择器核心脚本 -->
-    <script src="/static/plugins/bootstrap-datetimepicker-4.17.47/bootstrap-datetimepicker.min.js"></script>
-
-
-
-
-    <script>
-        // var today = new Date();
-        // var format_td = today.getFullYear() + '-' + (today.getMonth() + 1) + '-' + today.getDate();
-        // document.getElementById("datetimepicker").datetimepicker({
-        //     format: 'yyyy-mm-dd hh:00',
-        //     language: 'zh-CN',
-        //     todayBtn: 'linked',
-        //     maxView: 3,
-        //     minView: 1,
-        //     autoClose: true,
-        //     minuteStep: 30,
-        //     startDate: format_td,
-        //     pickerPosition: 'bottom-right'
-        // });
-
-            $("#datetimepicker").datetimepicker({
-                format: 'YYYY-MM-DD HH:mm',
-                // language: 'en',
-                // pickDate: true,
-                // pickTime: true,
-                // hourStep: 1,
-                // minuteStep: 15,
-                // secondStep: 30,
-                // inputMask: true
-            });
-            // $("#datetimepicker").datetimepicker();
-
-
-        
-        function sendMessage() {
-            var mobiles = $("#mobiles").val();
-            var content = $("#content").val();
-            var sign = $("#sign").val();
-
-            var datetime = $("#datetimepicker").val()
-
-            if (mobiles == "") {
-                alert("不能为空")
-                return
-            }
-            if (content == "") {
-                alert("不能为空")
-                return
-            }
-
-            $.ajax({
-                type: "GET",
-                url: "/sms/send",
-                data: {
-                    "mobiles": mobiles,
-                    "content": content,
-                    "sign": sign,
-                    "datetime": datetime,
-                },
-                success: function (result) {
-                    $("#mobiles").val("");
-                    $("#content").val("");
-                    $("#sign").val("");
-                    $("#datetime").val("");
-
-                    console.log(result);
-                    let res = jQuery.parseJSON(result);
-                    alert(res.message)
-                },
-                error: function (error) {
-                    console.log(error)
-                }
-            })
-        }
-    </script>
-
-
     <!-- 页面内容结束 -->
 </section>
 <!-- /.content -->
