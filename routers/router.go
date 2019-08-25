@@ -76,8 +76,8 @@ func init() {
 	beego.Router("/sms/smsdetaildatagrid", &controllers.SmsController{}, "Post:SmsDetailDataGrid")
 
 
-
-	beego.Router("/api/v1/sms/status", &controllers.ApiController{}, "Post:PostMessageState")
+	// 短信回调通知
+	beego.Router("/api/v1/sms/status", &controllers.ApiController{}, "Get,Post:PostMessageState")
 
 
 
